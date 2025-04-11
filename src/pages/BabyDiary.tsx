@@ -1,90 +1,199 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Image, Video, Heart, Calendar, Check, Trash2 } from "lucide-react";
+import { Plus, Image, Video, Heart, Calendar, Check, Trash2, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { format } from "date-fns";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-// Mock diary entries data
-const mockEntries = [
-  {
-    id: 1,
-    type: "photo",
-    title: "Primeiro sorriso",
-    description: "Hoje Maria deu seu primeiro sorriso real!",
-    date: "2024-03-15",
-    image: "https://images.unsplash.com/photo-1492725764893-90b379c2b6e7?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
-    milestone: "Social"
-  },
-  {
-    id: 2,
-    type: "note",
-    title: "Começou a sentar",
-    description: "Hoje Maria conseguiu sentar por conta própria por alguns segundos sem apoio.",
-    date: "2024-04-01",
-    milestone: "Motor"
-  },
-  {
-    id: 3,
-    type: "photo",
-    title: "Primeira papinha",
-    description: "Primeiro contato com alimentos sólidos. Adorou a banana!",
-    date: "2024-04-05",
-    image: "https://images.unsplash.com/photo-1505576399279-565b52d4ac71?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
-    milestone: "Alimentação"
-  },
-  {
-    id: 4,
-    type: "note",
-    title: "Balbuciando",
-    description: "Começou a fazer barulhinhos que parecem 'ma-ma-ma'.",
-    date: "2024-04-10",
-    milestone: "Linguagem"
-  }
-];
+import { supabase } from "@/integrations/supabase/client";
+import { useBaby } from "@/context/BabyContext";
+import { DiaryEntry } from "@/types";
+import { toast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const BabyDiary = () => {
   const [activeTab, setActiveTab] = useState("todos");
-  const [entries, setEntries] = useState(mockEntries);
-  const [newEntry, setNewEntry] = useState({
+  const [entries, setEntries] = useState<DiaryEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [newEntry, setNewEntry] = useState<Partial<DiaryEntry>>({
     title: "",
-    description: "",
+    content: "",
     type: "note",
-    date: format(new Date(), "yyyy-MM-dd"),
+    entry_date: format(new Date(), "yyyy-MM-dd"),
     milestone: ""
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   
-  const handleAddEntry = () => {
-    const entry = {
-      id: entries.length + 1,
-      ...newEntry,
-      image: newEntry.type === "photo" ? "https://images.unsplash.com/photo-1533483595632-c5f0e57a1936?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3" : undefined,
-    };
+  const { currentBaby } = useBaby();
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    if (!currentBaby) {
+      // Se não houver um bebê selecionado, redirecionar para o dashboard
+      navigate('/dashboard');
+      return;
+    }
     
-    setEntries([entry, ...entries]);
-    setNewEntry({
-      title: "",
-      description: "",
-      type: "note",
-      date: format(new Date(), "yyyy-MM-dd"),
-      milestone: ""
-    });
+    fetchEntries();
+  }, [currentBaby]);
+  
+  const fetchEntries = async () => {
+    if (!currentBaby) return;
+    
+    try {
+      setLoading(true);
+      
+      const { data, error } = await supabase
+        .from('diary_entries')
+        .select('*')
+        .eq('baby_id', currentBaby.id)
+        .order('entry_date', { ascending: false });
+        
+      if (error) throw error;
+      
+      // Converter os dados do banco para o formato usado no componente
+      const formattedEntries: DiaryEntry[] = data.map(entry => ({
+        ...entry,
+        type: entry.image_url && entry.image_url.length > 0 ? "photo" : 
+              entry.video_url && entry.video_url.length > 0 ? "video" : "note"
+      }));
+      
+      setEntries(formattedEntries);
+    } catch (error) {
+      console.error('Erro ao buscar entradas do diário:', error);
+      toast({
+        title: "Erro ao carregar o diário",
+        description: "Não foi possível carregar as entradas do diário",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const handleAddEntry = async () => {
+    if (!currentBaby) return;
+    
+    try {
+      setSubmitting(true);
+      
+      let imageUrl: string[] = [];
+      
+      // Se for uma entrada com foto, fazer upload da imagem
+      if (newEntry.type === "photo" && selectedFile) {
+        const fileExt = selectedFile.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `${currentBaby.id}/${fileName}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('diary_images')
+          .upload(filePath, selectedFile);
+          
+        if (uploadError) throw uploadError;
+        
+        const { data: { publicUrl } } = supabase.storage
+          .from('diary_images')
+          .getPublicUrl(filePath);
+          
+        imageUrl = [publicUrl];
+      }
+      
+      const entry = {
+        baby_id: currentBaby.id,
+        title: newEntry.title,
+        content: newEntry.content,
+        entry_date: newEntry.entry_date,
+        image_url: newEntry.type === "photo" ? imageUrl : [],
+        video_url: [] // Implementação futura para vídeos
+      };
+      
+      const { data, error } = await supabase
+        .from('diary_entries')
+        .insert(entry)
+        .select()
+        .single();
+        
+      if (error) throw error;
+      
+      // Adicionar a nova entrada à lista
+      const newEntryWithType: DiaryEntry = {
+        ...data,
+        type: imageUrl.length > 0 ? "photo" : "note",
+        milestone: newEntry.milestone || undefined
+      };
+      
+      setEntries([newEntryWithType, ...entries]);
+      
+      // Limpar o formulário
+      setNewEntry({
+        title: "",
+        content: "",
+        type: "note",
+        entry_date: format(new Date(), "yyyy-MM-dd"),
+        milestone: ""
+      });
+      
+      setSelectedFile(null);
+      setDialogOpen(false);
+      
+      toast({
+        title: "Entrada adicionada",
+        description: "Nova entrada adicionada ao diário com sucesso!",
+      });
+      
+    } catch (error) {
+      console.error('Erro ao adicionar entrada:', error);
+      toast({
+        title: "Erro ao adicionar entrada",
+        description: "Não foi possível adicionar a entrada ao diário",
+        variant: "destructive",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+  
+  const handleDeleteEntry = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('diary_entries')
+        .delete()
+        .eq('id', id);
+        
+      if (error) throw error;
+      
+      setEntries(entries.filter(entry => entry.id !== id));
+      
+      toast({
+        title: "Entrada removida",
+        description: "A entrada foi removida do diário com sucesso",
+      });
+      
+    } catch (error) {
+      console.error('Erro ao excluir entrada:', error);
+      toast({
+        title: "Erro ao remover entrada",
+        description: "Não foi possível remover a entrada do diário",
+        variant: "destructive",
+      });
+    }
   };
   
   const filteredEntries = activeTab === "todos" 
     ? entries 
     : entries.filter(entry => entry.type === activeTab);
   
-  const handleDeleteEntry = (id: number) => {
-    setEntries(entries.filter(entry => entry.id !== id));
-  };
+  if (!currentBaby) {
+    return null; // O useEffect irá redirecionar para o dashboard
+  }
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -96,11 +205,11 @@ const BabyDiary = () => {
             <div>
               <h1 className="text-3xl font-bold text-gray-800">Diário do Bebê</h1>
               <p className="text-gray-600">
-                Registre os momentos especiais e acompanhe o crescimento
+                Registre os momentos especiais e acompanhe o crescimento de {currentBaby.name}
               </p>
             </div>
             
-            <Dialog>
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="mt-4 md:mt-0 bg-minipassos-purple hover:bg-minipassos-purple-dark">
                   <Plus className="mr-2 h-4 w-4" />
@@ -116,7 +225,7 @@ const BabyDiary = () => {
                     <label htmlFor="entry-type" className="text-right text-sm font-medium">Tipo</label>
                     <Select 
                       value={newEntry.type} 
-                      onValueChange={(value) => setNewEntry({...newEntry, type: value})}
+                      onValueChange={(value) => setNewEntry({...newEntry, type: value as "note" | "photo" | "video"})}
                     >
                       <SelectTrigger className="col-span-3">
                         <SelectValue placeholder="Tipo de registro" />
@@ -144,8 +253,8 @@ const BabyDiary = () => {
                       id="date" 
                       type="date" 
                       className="col-span-3" 
-                      value={newEntry.date}
-                      onChange={(e) => setNewEntry({...newEntry, date: e.target.value})}
+                      value={newEntry.entry_date}
+                      onChange={(e) => setNewEntry({...newEntry, entry_date: e.target.value})}
                     />
                   </div>
                   <div className="grid grid-cols-4 gap-4 items-center">
@@ -170,7 +279,17 @@ const BabyDiary = () => {
                   {newEntry.type === "photo" && (
                     <div className="grid grid-cols-4 gap-4 items-center">
                       <label htmlFor="photo" className="text-right text-sm font-medium">Foto</label>
-                      <Input id="photo" type="file" accept="image/*" className="col-span-3" />
+                      <Input 
+                        id="photo" 
+                        type="file" 
+                        accept="image/*" 
+                        className="col-span-3" 
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files.length > 0) {
+                            setSelectedFile(e.target.files[0]);
+                          }
+                        }}
+                      />
                     </div>
                   )}
                   {newEntry.type === "video" && (
@@ -185,8 +304,8 @@ const BabyDiary = () => {
                       id="description" 
                       placeholder="Detalhes do momento..." 
                       className="col-span-3" 
-                      value={newEntry.description}
-                      onChange={(e) => setNewEntry({...newEntry, description: e.target.value})}
+                      value={newEntry.content || ''}
+                      onChange={(e) => setNewEntry({...newEntry, content: e.target.value})}
                     />
                   </div>
                 </div>
@@ -194,9 +313,16 @@ const BabyDiary = () => {
                   <Button 
                     onClick={handleAddEntry}
                     className="bg-minipassos-purple hover:bg-minipassos-purple-dark"
-                    disabled={!newEntry.title || !newEntry.date}
+                    disabled={submitting || !newEntry.title || !newEntry.entry_date}
                   >
-                    Salvar registro
+                    {submitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Salvando...
+                      </>
+                    ) : (
+                      'Salvar registro'
+                    )}
                   </Button>
                 </div>
               </DialogContent>
@@ -206,7 +332,7 @@ const BabyDiary = () => {
           <Card>
             <CardHeader>
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                <CardTitle>Registros</CardTitle>
+                <CardTitle>Registros de {currentBaby.name}</CardTitle>
                 <Tabs defaultValue="todos" onValueChange={setActiveTab} className="w-full sm:w-auto">
                   <TabsList className="grid grid-cols-3 w-full sm:w-[300px]">
                     <TabsTrigger value="todos">Todos</TabsTrigger>
@@ -217,7 +343,11 @@ const BabyDiary = () => {
               </div>
             </CardHeader>
             <CardContent>
-              {filteredEntries.length === 0 ? (
+              {loading ? (
+                <div className="flex justify-center items-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-minipassos-purple" />
+                </div>
+              ) : filteredEntries.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12">
                   <div className="text-gray-400 mb-4">
                     <Image size={64} />
@@ -234,10 +364,10 @@ const BabyDiary = () => {
                       key={entry.id} 
                       className="bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-md transition-all"
                     >
-                      {entry.type === "photo" && entry.image && (
+                      {entry.type === "photo" && entry.image_url && entry.image_url.length > 0 && (
                         <div 
                           className="h-48 bg-center bg-cover" 
-                          style={{ backgroundImage: `url(${entry.image})` }}
+                          style={{ backgroundImage: `url(${entry.image_url[0]})` }}
                         />
                       )}
                       <div className="p-5">
@@ -253,13 +383,13 @@ const BabyDiary = () => {
                           </Button>
                         </div>
                         
-                        <p className="text-gray-600 text-sm mb-4">{entry.description}</p>
+                        <p className="text-gray-600 text-sm mb-4">{entry.content}</p>
                         
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-1 text-gray-500 text-xs">
                             <Calendar size={14} />
                             <span>
-                              {format(new Date(entry.date), "dd/MM/yyyy")}
+                              {format(new Date(entry.entry_date), "dd/MM/yyyy")}
                             </span>
                           </div>
                           
