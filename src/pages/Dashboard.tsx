@@ -12,11 +12,13 @@ import { ptBR } from "date-fns/locale";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useAuth } from "@/context/AuthContext";
 import { useBaby } from "@/context/BabyContext";
+import { useMilestone } from "@/context/MilestoneContext";
 import MilestoneTimeline from "@/components/MilestoneTimeline";
 
 const Dashboard = () => {
   const { user } = useAuth();
   const { babies, currentBaby, setCurrentBaby } = useBaby();
+  const { milestones, babyMilestones } = useMilestone();
   const [registerDialogOpen, setRegisterDialogOpen] = useState(false);
   
   // Calcular a idade do bebê atual em meses
@@ -52,6 +54,28 @@ const Dashboard = () => {
   const formatDate = (dateString: string) => {
     return format(parseISO(dateString), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
   };
+  
+  // Prepare milestones data for the timeline
+  const getCurrentAgeInMonths = () => {
+    if (!currentBaby) return 0;
+    const birthDate = parseISO(currentBaby.birth_date);
+    return differenceInMonths(new Date(), birthDate);
+  };
+  
+  const currentAgeInMonths = getCurrentAgeInMonths();
+  
+  // Prepare milestone data with completion status
+  const preparedMilestones = milestones.map(milestone => {
+    const babyMilestone = babyMilestones.find(bm => 
+      bm.milestone_id === milestone.id && currentBaby && bm.baby_id === currentBaby.id
+    );
+    
+    return {
+      ...milestone,
+      completed: babyMilestone ? babyMilestone.completed : false,
+      completion_date: babyMilestone ? babyMilestone.completion_date : undefined
+    };
+  });
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -220,7 +244,10 @@ const Dashboard = () => {
                           </CardDescription>
                         </CardHeader>
                         <CardContent className="px-2">
-                          <MilestoneTimeline />
+                          <MilestoneTimeline 
+                            milestones={preparedMilestones} 
+                            currentMonth={currentAgeInMonths}
+                          />
                         </CardContent>
                       </Card>
                       
@@ -297,7 +324,10 @@ const Dashboard = () => {
                         </CardHeader>
                         <CardContent>
                           <div className="space-y-8">
-                            <MilestoneTimeline />
+                            <MilestoneTimeline 
+                              milestones={preparedMilestones}
+                              currentMonth={currentAgeInMonths}
+                            />
                             
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                               <div>
@@ -306,14 +336,20 @@ const Dashboard = () => {
                                   Marcos alcançados
                                 </h3>
                                 <div className="space-y-2">
-                                  <div className="flex items-center gap-2 p-2 bg-green-50 rounded-lg border border-green-100">
-                                    <Check size={16} className="text-green-500" />
-                                    <span className="text-sm">Primeiro sorriso social</span>
-                                  </div>
-                                  <div className="flex items-center gap-2 p-2 bg-green-50 rounded-lg border border-green-100">
-                                    <Check size={16} className="text-green-500" />
-                                    <span className="text-sm">Sustenta a cabeça</span>
-                                  </div>
+                                  {preparedMilestones
+                                    .filter(m => m.completed)
+                                    .slice(0, 2)
+                                    .map(milestone => (
+                                      <div key={milestone.id} className="flex items-center gap-2 p-2 bg-green-50 rounded-lg border border-green-100">
+                                        <Check size={16} className="text-green-500" />
+                                        <span className="text-sm">{milestone.title}</span>
+                                      </div>
+                                    ))}
+                                  {preparedMilestones.filter(m => m.completed).length === 0 && (
+                                    <p className="text-sm text-gray-500 p-2">
+                                      Nenhum marco alcançado ainda
+                                    </p>
+                                  )}
                                 </div>
                               </div>
                               
@@ -323,14 +359,20 @@ const Dashboard = () => {
                                   Próximos marcos
                                 </h3>
                                 <div className="space-y-2">
-                                  <div className="flex items-center gap-2 p-2 bg-yellow-50 rounded-lg border border-yellow-100">
-                                    <Clock size={16} className="text-yellow-500" />
-                                    <span className="text-sm">Senta com apoio</span>
-                                  </div>
-                                  <div className="flex items-center gap-2 p-2 bg-yellow-50 rounded-lg border border-yellow-100">
-                                    <Clock size={16} className="text-yellow-500" />
-                                    <span className="text-sm">Balbucia sílabas</span>
-                                  </div>
+                                  {preparedMilestones
+                                    .filter(m => !m.completed && m.age_months >= currentAgeInMonths)
+                                    .slice(0, 2)
+                                    .map(milestone => (
+                                      <div key={milestone.id} className="flex items-center gap-2 p-2 bg-yellow-50 rounded-lg border border-yellow-100">
+                                        <Clock size={16} className="text-yellow-500" />
+                                        <span className="text-sm">{milestone.title}</span>
+                                      </div>
+                                    ))}
+                                  {preparedMilestones.filter(m => !m.completed && m.age_months >= currentAgeInMonths).length === 0 && (
+                                    <p className="text-sm text-gray-500 p-2">
+                                      Não há próximos marcos para exibir
+                                    </p>
+                                  )}
                                 </div>
                               </div>
                               
@@ -340,42 +382,31 @@ const Dashboard = () => {
                                   Distribuição
                                 </h3>
                                 <div className="space-y-2">
-                                  <div className="space-y-1">
-                                    <div className="flex justify-between text-xs">
-                                      <span>Motor</span>
-                                      <span>25%</span>
-                                    </div>
-                                    <div className="w-full bg-gray-200 rounded-full h-2">
-                                      <div className="bg-minipassos-purple h-2 rounded-full" style={{ width: "25%" }}></div>
-                                    </div>
-                                  </div>
-                                  <div className="space-y-1">
-                                    <div className="flex justify-between text-xs">
-                                      <span>Cognitivo</span>
-                                      <span>20%</span>
-                                    </div>
-                                    <div className="w-full bg-gray-200 rounded-full h-2">
-                                      <div className="bg-minipassos-blue h-2 rounded-full" style={{ width: "20%" }}></div>
-                                    </div>
-                                  </div>
-                                  <div className="space-y-1">
-                                    <div className="flex justify-between text-xs">
-                                      <span>Social</span>
-                                      <span>33%</span>
-                                    </div>
-                                    <div className="w-full bg-gray-200 rounded-full h-2">
-                                      <div className="bg-minipassos-green h-2 rounded-full" style={{ width: "33%" }}></div>
-                                    </div>
-                                  </div>
-                                  <div className="space-y-1">
-                                    <div className="flex justify-between text-xs">
-                                      <span>Linguagem</span>
-                                      <span>15%</span>
-                                    </div>
-                                    <div className="w-full bg-gray-200 rounded-full h-2">
-                                      <div className="bg-minipassos-purple-dark h-2 rounded-full" style={{ width: "15%" }}></div>
-                                    </div>
-                                  </div>
+                                  {["motor", "cognitivo", "social", "linguagem"].map(category => {
+                                    const total = preparedMilestones.filter(m => m.category === category).length;
+                                    const completed = preparedMilestones.filter(m => m.category === category && m.completed).length;
+                                    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+                                    
+                                    return (
+                                      <div key={category} className="space-y-1">
+                                        <div className="flex justify-between text-xs">
+                                          <span>{category.charAt(0).toUpperCase() + category.slice(1)}</span>
+                                          <span>{percentage}%</span>
+                                        </div>
+                                        <div className="w-full bg-gray-200 rounded-full h-2">
+                                          <div 
+                                            className={`h-2 rounded-full ${
+                                              category === "motor" ? "bg-minipassos-purple" :
+                                              category === "cognitivo" ? "bg-minipassos-blue" :
+                                              category === "social" ? "bg-minipassos-green" :
+                                              "bg-minipassos-purple-dark"
+                                            }`} 
+                                            style={{ width: `${percentage}%` }}
+                                          ></div>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
                                 </div>
                               </div>
                             </div>

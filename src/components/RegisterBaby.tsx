@@ -60,8 +60,13 @@ export default function RegisterBaby() {
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     try {
+      // Make sure all required fields are present
       await addBaby({
-        ...data,
+        name: data.name,
+        gender: data.gender,
+        birth_date: data.birth_date,
+        weight: data.weight,
+        height: data.height
       });
     } catch (error) {
       console.error("Erro ao registrar bebê:", error);
