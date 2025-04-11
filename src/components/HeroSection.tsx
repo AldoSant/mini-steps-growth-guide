@@ -24,7 +24,7 @@ const HeroSection = () => {
 
             <div className="flex flex-col sm:flex-row gap-4">
               <Button asChild size="lg" className="bg-minipassos-purple hover:bg-minipassos-purple-dark">
-                <Link to="/cadastro">
+                <Link to="/auth">
                   Começar agora
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
