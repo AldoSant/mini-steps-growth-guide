@@ -1,5 +1,5 @@
 
-import { ArrowRight, Baby, BookOpen, Calendar, Activity, Image, BarChart } from "lucide-react";
+import { ArrowRight, Baby, BookOpen, Calendar, Activity, Image, BarChart, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
