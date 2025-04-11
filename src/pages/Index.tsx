@@ -6,8 +6,11 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import HeroSection from "@/components/HeroSection";
 import BabyForm from "@/components/BabyForm";
+import { useAuth } from "@/context/AuthContext";
 
 const Index = () => {
+  const { user } = useAuth();
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -123,10 +126,39 @@ const Index = () => {
                     </li>
                   ))}
                 </ul>
+                
+                {!user && (
+                  <div className="mt-4">
+                    <Button asChild size="lg" className="bg-minipassos-purple hover:bg-minipassos-purple-dark">
+                      <Link to="/auth">
+                        Criar uma conta
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </div>
+                )}
               </div>
               
               <div>
-                <BabyForm />
+                {user ? (
+                  <BabyForm />
+                ) : (
+                  <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 text-center space-y-6">
+                    <Baby size={60} className="mx-auto text-minipassos-purple" />
+                    <h3 className="text-xl font-bold">Faça login para cadastrar seu bebê</h3>
+                    <p className="text-gray-600">
+                      Crie uma conta gratuita ou faça login para começar a acompanhar o desenvolvimento do seu bebê.
+                    </p>
+                    <Button 
+                      asChild 
+                      className="w-full bg-minipassos-purple hover:bg-minipassos-purple-dark"
+                    >
+                      <Link to="/auth">
+                        Entrar ou Cadastrar
+                      </Link>
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -181,8 +213,8 @@ const Index = () => {
             
             <div className="mt-12 text-center">
               <Button asChild size="lg" className="bg-minipassos-purple hover:bg-minipassos-purple-dark">
-                <Link to="/cadastro">
-                  Começar gratuitamente
+                <Link to={user ? "/dashboard" : "/auth"}>
+                  {user ? "Ir para o Dashboard" : "Começar gratuitamente"}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>

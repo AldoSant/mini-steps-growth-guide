@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,18 +10,73 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/context/AuthContext";
 
 const BabyForm = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [name, setName] = useState("");
   const [gender, setGender] = useState<string | undefined>(undefined);
   const [birthDate, setBirthDate] = useState<Date | undefined>(undefined);
   const [weight, setWeight] = useState("");
   const [height, setHeight] = useState("");
+  const [loading, setLoading] = useState(false);
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ name, gender, birthDate, weight, height });
-    // Todo: Save baby info
+    
+    if (!user) {
+      toast({
+        title: "Você precisa estar logado",
+        description: "Faça login ou crie uma conta para cadastrar um bebê",
+        variant: "destructive",
+      });
+      navigate("/auth");
+      return;
+    }
+    
+    if (!birthDate) {
+      toast({
+        title: "Data inválida",
+        description: "Por favor, selecione a data de nascimento",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setLoading(true);
+    
+    try {
+      const { error } = await supabase.from("babies").insert({
+        user_id: user.id,
+        name,
+        gender,
+        birth_date: birthDate.toISOString().split("T")[0],
+        weight: parseFloat(weight),
+        height: parseFloat(height)
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Bebê cadastrado com sucesso!",
+        description: `${name} foi adicionado à sua conta.`,
+      });
+      
+      // Redirecionar para o dashboard
+      navigate("/dashboard");
+    } catch (error: any) {
+      toast({
+        title: "Erro ao cadastrar bebê",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -107,8 +163,9 @@ const BabyForm = () => {
       <Button 
         type="submit" 
         className="w-full bg-minipassos-purple hover:bg-minipassos-purple-dark"
+        disabled={loading}
       >
-        Cadastrar Bebê
+        {loading ? "Cadastrando..." : "Cadastrar Bebê"}
       </Button>
     </form>
   );

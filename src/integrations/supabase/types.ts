@@ -9,7 +9,274 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      activities: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          id: string
+          image_url: string | null
+          instructions: string
+          materials: string[] | null
+          max_age_months: number
+          min_age_months: number
+          title: string
+          video_url: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          id?: string
+          image_url?: string | null
+          instructions: string
+          materials?: string[] | null
+          max_age_months: number
+          min_age_months: number
+          title: string
+          video_url?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          instructions?: string
+          materials?: string[] | null
+          max_age_months?: number
+          min_age_months?: number
+          title?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
+      babies: {
+        Row: {
+          birth_date: string
+          created_at: string
+          gender: string
+          height: number
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+          weight: number
+        }
+        Insert: {
+          birth_date: string
+          created_at?: string
+          gender: string
+          height: number
+          id?: string
+          name: string
+          updated_at?: string
+          user_id: string
+          weight: number
+        }
+        Update: {
+          birth_date?: string
+          created_at?: string
+          gender?: string
+          height?: number
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+          weight?: number
+        }
+        Relationships: []
+      }
+      baby_milestones: {
+        Row: {
+          baby_id: string
+          completed: boolean
+          completion_date: string | null
+          created_at: string
+          id: string
+          milestone_id: string
+          notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          baby_id: string
+          completed?: boolean
+          completion_date?: string | null
+          created_at?: string
+          id?: string
+          milestone_id: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          baby_id?: string
+          completed?: boolean
+          completion_date?: string | null
+          created_at?: string
+          id?: string
+          milestone_id?: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "baby_milestones_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "baby_milestones_milestone_id_fkey"
+            columns: ["milestone_id"]
+            isOneToOne: false
+            referencedRelation: "milestones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diary_entries: {
+        Row: {
+          baby_id: string
+          content: string | null
+          created_at: string
+          entry_date: string
+          id: string
+          image_url: string[] | null
+          title: string
+          updated_at: string
+          video_url: string[] | null
+        }
+        Insert: {
+          baby_id: string
+          content?: string | null
+          created_at?: string
+          entry_date?: string
+          id?: string
+          image_url?: string[] | null
+          title: string
+          updated_at?: string
+          video_url?: string[] | null
+        }
+        Update: {
+          baby_id?: string
+          content?: string | null
+          created_at?: string
+          entry_date?: string
+          id?: string
+          image_url?: string[] | null
+          title?: string
+          updated_at?: string
+          video_url?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diary_entries_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          baby_id: string
+          completed: boolean
+          created_at: string
+          description: string | null
+          event_date: string
+          event_type: string
+          id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          baby_id: string
+          completed?: boolean
+          created_at?: string
+          description?: string | null
+          event_date: string
+          event_type: string
+          id?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          baby_id?: string
+          completed?: boolean
+          created_at?: string
+          description?: string | null
+          event_date?: string
+          event_type?: string
+          id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      milestones: {
+        Row: {
+          age_months: number
+          category: string
+          created_at: string
+          description: string
+          id: string
+          title: string
+        }
+        Insert: {
+          age_months: number
+          category: string
+          created_at?: string
+          description: string
+          id?: string
+          title: string
+        }
+        Update: {
+          age_months?: number
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          updated_at: string
+          user_role: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          updated_at?: string
+          user_role?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+          user_role?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
