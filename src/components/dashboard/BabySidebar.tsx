@@ -1,145 +1,103 @@
-
-import { Link, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Plus, Baby, Edit2 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import RegisterBaby from "@/components/RegisterBaby";
-import BabyForm from "@/components/BabyForm";
-import { useBaby } from "@/context/BabyContext";
-import { formatDate, getBabyAge } from "@/lib/date-utils";
-import { toast } from "@/components/ui/use-toast";
 import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useBaby } from "@/context/BabyContext";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Pencil } from "lucide-react";
+import { calculateAge } from "@/lib/utils";
+import { Calendar, BookOpen, Layout, User, Stethoscope } from "lucide-react";
 
 const BabySidebar = () => {
-  const { babies, currentBaby, setCurrentBaby, deleteBaby } = useBaby();
+  const { currentBaby, babies, switchBaby } = useBaby();
   const navigate = useNavigate();
-  const [editBabyId, setEditBabyId] = useState<string | null>(null);
-  const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const location = useLocation();
   
-  const handleDelete = async (id: string) => {
-    if (window.confirm("Tem certeza que deseja excluir este registro?")) {
-      const success = await deleteBaby(id);
-      if (success) {
-        toast({
-          title: "Bebê removido",
-          description: "O registro foi excluído com sucesso.",
-        });
-      }
-    }
+  const handleBabySwitch = (babyId: string) => {
+    switchBaby(babyId);
   };
 
   return (
-    <div className="lg:col-span-1">
-      <Card className="mb-6">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-medium">Meus bebês</h2>
-            <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Adicionar bebê</DialogTitle>
-                </DialogHeader>
-                {/* Pass setAddDialogOpen as a custom prop that RegisterBaby can use internally */}
-                <RegisterBaby />
-              </DialogContent>
-            </Dialog>
-          </div>
-
-          <div className="space-y-3">
-            {babies.map((baby) => (
-              <div
-                key={baby.id}
-                className={`p-3 rounded-md cursor-pointer transition-colors ${
-                  currentBaby?.id === baby.id
-                    ? "bg-primary/10 border border-primary/20"
-                    : "hover:bg-accent"
-                }`}
-                onClick={() => setCurrentBaby(baby)}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div
-                      className={`w-2 h-2 rounded-full mr-2 ${
-                        baby.gender === "M"
-                          ? "bg-blue-500"
-                          : baby.gender === "F"
-                          ? "bg-pink-500"
-                          : "bg-purple-500"
-                      }`}
-                    ></div>
-                    <span className="font-medium">{baby.name}</span>
-                  </div>
-
-                  <Dialog open={editDialogOpen && editBabyId === baby.id} onOpenChange={(open) => {
-                    setEditDialogOpen(open);
-                    if (!open) setEditBabyId(null);
-                  }}>
-                    <DialogTrigger asChild onClick={(e) => {
-                      e.stopPropagation();
-                      setEditBabyId(baby.id);
-                    }}>
-                      <Button variant="ghost" size="icon" className="h-6 w-6 opacity-70 hover:opacity-100">
-                        <Edit2 className="h-3 w-3" />
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Editar bebê</DialogTitle>
-                      </DialogHeader>
-                      {/* BabyForm doesn't accept these props so we're not passing them */}
-                      <BabyForm />
-                    </DialogContent>
-                  </Dialog>
-                </div>
-
-                <div className="mt-1 text-xs text-muted-foreground">
-                  {getBabyAge(baby)}
-                </div>
-
-                <div className="mt-2 text-xs text-muted-foreground">
-                  Nascido em {formatDate(baby.birth_date).split(" de ").slice(0, -1).join(" de ")}
-                </div>
-              </div>
-            ))}
-
-            {babies.length === 0 && (
-              <div className="text-center py-4 text-muted-foreground">
-                <p className="text-sm">Nenhum bebê cadastrado</p>
-                <p className="text-xs mt-1">
-                  Adicione um bebê para começar a acompanhar o desenvolvimento
-                </p>
-              </div>
-            )}
-          </div>
-        </CardContent>
-
+    <div className="flex flex-col h-full">
+      <div className="p-4 bg-white rounded-lg shadow mb-4">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="font-medium">Bebê Selecionado</h3>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-8 px-2 text-minipassos-purple hover:text-minipassos-purple-dark hover:bg-minipassos-purple-light/50" 
+            onClick={() => navigate('/perfil')}
+          >
+            <Pencil size={16} />
+            <span className="sr-only">Editar</span>
+          </Button>
+        </div>
+        
         {currentBaby && (
-          <CardFooter className="flex justify-between p-4 pt-0">
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full border-minipassos-purple text-minipassos-purple hover:bg-minipassos-purple/10"
-              onClick={() => navigate("/perfil")}
-            >
-              <Baby className="mr-2 h-4 w-4" />
-              Ver perfil completo
-            </Button>
-          </CardFooter>
+          <div className="flex items-center space-x-4">
+            <Avatar className="h-12 w-12">
+              <AvatarFallback className="bg-minipassos-purple-light text-minipassos-purple-dark">
+                {currentBaby.name[0]}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="font-medium text-gray-700">{currentBaby.name}</p>
+              <p className="text-sm text-muted-foreground">
+                {calculateAge(currentBaby.birth_date)}
+              </p>
+            </div>
+          </div>
         )}
-      </Card>
+      </div>
+
+      <div className="flex flex-col flex-1 space-y-4">
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h3 className="font-medium mb-3">Navegação Rápida</h3>
+          <nav className="space-y-1">
+            {[
+              { icon: Layout, label: 'Dashboard', path: '/dashboard' },
+              { icon: Calendar, label: 'Diário', path: '/diario' },
+              { icon: BookOpen, label: 'Atividades', path: '/atividades' },
+              { icon: Stethoscope, label: 'Histórico Médico', path: '/historico-medico' },
+              { icon: User, label: 'Perfil', path: '/perfil' },
+            ].map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
+                  location.pathname === item.path
+                    ? 'bg-minipassos-purple text-white'
+                    : 'text-gray-700 hover:bg-minipassos-purple-light hover:text-minipassos-purple-dark'
+                }`}
+              >
+                <item.icon size={18} className="mr-2" />
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+
+        {babies && babies.length > 1 && (
+          <div className="bg-white p-4 rounded-lg shadow">
+            <h3 className="font-medium mb-3">Outros Bebês</h3>
+            <div className="space-y-2">
+              {babies.map((baby) => (
+                <Button
+                  key={baby.id}
+                  variant="outline"
+                  className={`w-full justify-start text-sm ${
+                    currentBaby?.id === baby.id
+                      ? "bg-minipassos-purple-light text-minipassos-purple-dark hover:bg-minipassos-purple-light/80"
+                      : "hover:bg-gray-100"
+                  }`}
+                  onClick={() => handleBabySwitch(baby.id)}
+                >
+                  {baby.name}
+                </Button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

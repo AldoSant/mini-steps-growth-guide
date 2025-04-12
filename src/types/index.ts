@@ -75,7 +75,7 @@ export interface Event {
 
 // Medical related types
 export interface MedicalVisit {
-  id: string;
+  id?: string;
   baby_id: string;
   visit_date: string;
   doctor_name: string;
@@ -88,7 +88,7 @@ export interface MedicalVisit {
 }
 
 export interface MedicalAppointment {
-  id: string;
+  id?: string;
   baby_id: string;
   appointment_date: string;
   appointment_time?: string;
@@ -102,7 +102,7 @@ export interface MedicalAppointment {
 }
 
 export interface MedicalData {
-  id: string;
+  id?: string;
   baby_id: string;
   blood_type?: string;
   allergies?: string[];
@@ -117,7 +117,7 @@ export interface MedicalData {
 }
 
 export interface Vaccine {
-  id: string;
+  id?: string;
   baby_id: string;
   name: string;
   date?: string;
@@ -126,4 +126,14 @@ export interface Vaccine {
   notes?: string;
   created_at?: string;
   updated_at?: string;
+}
+
+export interface SubscriptionPlan {
+  id: string;
+  name: string;
+  price: number;
+  period: 'mensal' | 'anual';
+  features: string[];
+  isPopular?: boolean;
+  color?: string;
 }

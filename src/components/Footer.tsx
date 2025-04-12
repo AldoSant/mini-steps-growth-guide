@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { Baby, Mail, Instagram, Facebook, Twitter } from "lucide-react";
+import { Baby, Mail, Instagram, Facebook, Twitter, Stethoscope, CreditCard } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -46,7 +46,7 @@ const Footer = () => {
                 <Link to="/atividades" className="text-gray-500 hover:text-minipassos-purple">Atividades Diárias</Link>
               </li>
               <li>
-                <Link to="/calendario" className="text-gray-500 hover:text-minipassos-purple">Calendário</Link>
+                <Link to="/historico-medico" className="text-gray-500 hover:text-minipassos-purple">Histórico Médico</Link>
               </li>
               <li>
                 <Link to="/biblioteca" className="text-gray-500 hover:text-minipassos-purple">Biblioteca</Link>
@@ -67,7 +67,10 @@ const Footer = () => {
                 <Link to="/metodologia" className="text-gray-500 hover:text-minipassos-purple">Metodologia</Link>
               </li>
               <li>
-                <Link to="/para-profissionais" className="text-gray-500 hover:text-minipassos-purple">Para Profissionais</Link>
+                <Link to="/assinatura" className="text-gray-500 hover:text-minipassos-purple flex items-center gap-1">
+                  <CreditCard size={14} />
+                  <span>Planos de Assinatura</span>
+                </Link>
               </li>
             </ul>
           </div>

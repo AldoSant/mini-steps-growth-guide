@@ -19,7 +19,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Menu, LogOut, User, FileText, Home, BookOpen, Calendar, Baby } from "lucide-react";
+import { Menu, LogOut, User, FileText, Home, BookOpen, Calendar, Baby, Stethoscope } from "lucide-react";
 
 const Header = () => {
   const { user, signOut } = useAuth();
@@ -38,6 +38,7 @@ const Header = () => {
     { name: "Dashboard", path: "/dashboard", icon: <FileText className="h-5 w-5 mr-2" /> },
     { name: "Diário", path: "/diario", icon: <Calendar className="h-5 w-5 mr-2" /> },
     { name: "Atividades", path: "/atividades", icon: <BookOpen className="h-5 w-5 mr-2" /> },
+    { name: "Histórico Médico", path: "/historico-medico", icon: <Stethoscope className="h-5 w-5 mr-2" /> },
     { name: "Perfil", path: "/perfil", icon: <Baby className="h-5 w-5 mr-2" /> },
   ];
 
@@ -140,6 +141,10 @@ const Header = () => {
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>Minha conta</DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate("/historico-medico")}>
+                    <Stethoscope className="h-4 w-4 mr-2" />
+                    Histórico Médico
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/perfil")}>
                     <Baby className="h-4 w-4 mr-2" />
                     Perfil do bebê

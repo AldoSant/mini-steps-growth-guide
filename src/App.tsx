@@ -8,6 +8,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { BabyProvider } from "./context/BabyContext";
 import { MilestoneProvider } from "./context/MilestoneContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import FloatingMenu from "./components/FloatingMenu";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -16,6 +17,7 @@ import Activities from "./pages/Activities";
 import Library from "./pages/Library";
 import BabyProfile from "./pages/BabyProfile";
 import MedicalHistory from "./pages/MedicalHistory";
+import Subscription from "./pages/Subscription";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +34,7 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/assinatura" element={<Subscription />} />
                 
                 {/* Rotas protegidas */}
                 <Route element={<ProtectedRoute />}>
@@ -46,6 +49,7 @@ const App = () => (
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              <FloatingMenu />
             </BrowserRouter>
           </TooltipProvider>
         </MilestoneProvider>
