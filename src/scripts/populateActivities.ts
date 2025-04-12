@@ -1,5 +1,6 @@
 
 import { supabase } from "../integrations/supabase/client";
+import { populateInitialMilestones } from "./populateMilestones";
 
 export const populateInitialActivities = async () => {
   try {
