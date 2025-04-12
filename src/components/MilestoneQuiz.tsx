@@ -224,7 +224,7 @@ const MilestoneQuiz = ({ milestoneId, milestoneTitle, category, ageMonths, onCom
       description: passThreshold 
         ? "Parabéns! Seu bebê está se desenvolvendo bem nesta área." 
         : "Continue estimulando seu bebê nesta área de desenvolvimento.",
-      variant: passThreshold ? "default" : "secondary",
+      variant: passThreshold ? "default" : "default", // Fix: Changed "secondary" to "default"
     });
     
     onComplete();
