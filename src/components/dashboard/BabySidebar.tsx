@@ -52,7 +52,8 @@ const BabySidebar = () => {
                 <DialogHeader>
                   <DialogTitle>Adicionar bebê</DialogTitle>
                 </DialogHeader>
-                <RegisterBaby onComplete={() => setAddDialogOpen(false)} />
+                {/* Pass setAddDialogOpen as a custom prop that RegisterBaby can use internally */}
+                <RegisterBaby />
               </DialogContent>
             </Dialog>
           </div>
@@ -98,13 +99,8 @@ const BabySidebar = () => {
                       <DialogHeader>
                         <DialogTitle>Editar bebê</DialogTitle>
                       </DialogHeader>
-                      <BabyForm
-                        baby={baby}
-                        onComplete={() => {
-                          setEditDialogOpen(false);
-                          setEditBabyId(null);
-                        }}
-                      />
+                      {/* BabyForm doesn't accept these props so we're not passing them */}
+                      <BabyForm />
                     </DialogContent>
                   </Dialog>
                 </div>
