@@ -15,6 +15,7 @@ import BabyDiary from "./pages/BabyDiary";
 import Activities from "./pages/Activities";
 import Library from "./pages/Library";
 import BabyProfile from "./pages/BabyProfile";
+import MedicalHistory from "./pages/MedicalHistory";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +40,7 @@ const App = () => (
                   <Route path="/atividades" element={<Activities />} />
                   <Route path="/biblioteca" element={<Library />} />
                   <Route path="/perfil" element={<BabyProfile />} />
+                  <Route path="/historico-medico" element={<MedicalHistory />} />
                 </Route>
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
