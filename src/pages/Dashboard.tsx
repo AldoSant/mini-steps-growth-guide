@@ -3,12 +3,11 @@ import { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus } from "lucide-react";
 import { useBaby } from "@/context/BabyContext";
 import { useMilestone } from "@/context/MilestoneContext";
 import { getCurrentAgeInMonths } from "@/lib/date-utils";
 
-// Imported refactored components
+// Imported components
 import BabySidebar from "@/components/dashboard/BabySidebar";
 import WelcomeScreen from "@/components/dashboard/WelcomeScreen";
 import DashboardOverview from "@/components/dashboard/DashboardOverview";

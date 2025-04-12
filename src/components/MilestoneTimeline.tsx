@@ -1,9 +1,13 @@
 
-import { Check, Clock } from "lucide-react";
+import { useState } from "react";
+import { Check, Clock, HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Milestone, BabyMilestone } from "@/types";
-import { differenceInMonths, parseISO, format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { Milestone } from "@/types";
+import { formatDate } from "@/lib/date-utils";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import MilestoneQuiz from "./MilestoneQuiz";
+import { useMilestone } from "@/context/MilestoneContext";
 
 interface MilestoneTimelineProps {
   milestones: (Milestone & { completed?: boolean; completion_date?: string })[];
@@ -11,6 +15,10 @@ interface MilestoneTimelineProps {
 }
 
 const MilestoneTimeline = ({ milestones, currentMonth }: MilestoneTimelineProps) => {
+  const [quizOpen, setQuizOpen] = useState(false);
+  const [selectedMilestone, setSelectedMilestone] = useState<(Milestone & { completed?: boolean; completion_date?: string }) | null>(null);
+  const { completeMilestone } = useMilestone();
+  
   // Filter milestones for the current window (current month +/- 2 months)
   const relevantMilestones = milestones.filter(
     (milestone) => 
@@ -48,9 +56,24 @@ const MilestoneTimeline = ({ milestones, currentMonth }: MilestoneTimelineProps)
     }
   };
 
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return "";
-    return format(parseISO(dateString), "dd 'de' MMMM", { locale: ptBR });
+  const handleOpenQuiz = (milestone: (Milestone & { completed?: boolean; completion_date?: string })) => {
+    setSelectedMilestone(milestone);
+    setQuizOpen(true);
+  };
+
+  const handleQuizComplete = () => {
+    setQuizOpen(false);
+    setSelectedMilestone(null);
+  };
+
+  const handleToggleMilestone = async (milestone: Milestone & { completed?: boolean }) => {
+    if (!milestone.completed) {
+      // Se não está completo, abrir o quiz
+      handleOpenQuiz(milestone);
+    } else {
+      // Se já está completo, apenas desmarcar
+      await completeMilestone(milestone.id, false);
+    }
   };
 
   return (
@@ -83,11 +106,12 @@ const MilestoneTimeline = ({ milestones, currentMonth }: MilestoneTimelineProps)
               <div className="flex flex-col items-center">
                 <div 
                   className={cn(
-                    "w-10 h-10 rounded-full flex items-center justify-center",
+                    "w-10 h-10 rounded-full flex items-center justify-center cursor-pointer transition-colors",
                     milestone.completed 
-                      ? "bg-green-100 text-green-600" 
-                      : "bg-gray-100 text-gray-400"
+                      ? "bg-green-100 text-green-600 hover:bg-green-200" 
+                      : "bg-gray-100 text-gray-400 hover:bg-gray-200"
                   )}
+                  onClick={() => handleToggleMilestone(milestone)}
                 >
                   {milestone.completed ? <Check size={20} /> : <Clock size={20} />}
                 </div>
@@ -123,17 +147,47 @@ const MilestoneTimeline = ({ milestones, currentMonth }: MilestoneTimelineProps)
                   <h3 className="font-bold text-gray-800">{milestone.title}</h3>
                   <p className="text-gray-600 text-sm mt-1">{milestone.description}</p>
                   
-                  {milestone.completed && milestone.completion_date && (
-                    <div className="mt-2 text-xs text-green-600 font-medium">
-                      Completo em {formatDate(milestone.completion_date)}
-                    </div>
-                  )}
+                  <div className="mt-3 flex items-center justify-between">
+                    {milestone.completed && milestone.completion_date ? (
+                      <div className="text-xs text-green-600 font-medium">
+                        Completo em {formatDate(milestone.completion_date)}
+                      </div>
+                    ) : (
+                      <div></div>
+                    )}
+                    
+                    {!milestone.completed && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs text-minipassos-purple border-minipassos-purple hover:bg-minipassos-purple/10"
+                        onClick={() => handleOpenQuiz(milestone)}
+                      >
+                        <HelpCircle className="mr-1 h-3 w-3" />
+                        Avaliar marco
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           ))}
         </div>
       )}
+      
+      <Dialog open={quizOpen} onOpenChange={setQuizOpen}>
+        <DialogContent className="sm:max-w-[550px]">
+          {selectedMilestone && (
+            <MilestoneQuiz
+              milestoneId={selectedMilestone.id}
+              milestoneTitle={selectedMilestone.title}
+              category={selectedMilestone.category}
+              ageMonths={selectedMilestone.age_months}
+              onComplete={handleQuizComplete}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
