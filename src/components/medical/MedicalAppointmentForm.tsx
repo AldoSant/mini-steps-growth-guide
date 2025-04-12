@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,6 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { supabase } from "@/integrations/supabase/client";
 import { useBaby } from "@/context/BabyContext";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
@@ -23,20 +21,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-
-interface MedicalAppointment {
-  id: string;
-  baby_id: string;
-  appointment_date: string;
-  appointment_time?: string;
-  doctor_name: string;
-  appointment_type: string;
-  location?: string;
-  notes?: string;
-  completed: boolean;
-  created_at?: string;
-  updated_at?: string;
-}
+import { MedicalAppointment } from "@/types";
+import { createMedicalAppointment, updateMedicalAppointment } from "@/lib/supabase-helpers";
 
 interface MedicalAppointmentFormProps {
   appointment?: MedicalAppointment;
@@ -105,25 +91,16 @@ const MedicalAppointmentForm = ({ appointment, onComplete }: MedicalAppointmentF
       };
       
       if (appointment) {
-        // Atualizar consulta existente
-        const { error } = await supabase
-          .from("medical_appointments")
-          .update(payload)
-          .eq("id", appointment.id);
-          
-        if (error) throw error;
+        // Update existing appointment
+        await updateMedicalAppointment(appointment.id, payload);
         
         toast({
           title: "Consulta atualizada",
           description: "O agendamento foi atualizado com sucesso",
         });
       } else {
-        // Criar nova consulta
-        const { error } = await supabase
-          .from("medical_appointments")
-          .insert(payload);
-          
-        if (error) throw error;
+        // Create new appointment
+        await createMedicalAppointment(payload);
         
         toast({
           title: "Consulta agendada",

@@ -1,41 +1,25 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Edit, Hospital, Pill, Plus, Syringe } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { useBaby } from "@/context/BabyContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-
-interface MedicalData {
-  id: string;
-  baby_id: string;
-  blood_type?: string;
-  allergies?: string[];
-  chronic_conditions?: string[];
-  medications?: string[];
-  pediatrician_name?: string;
-  pediatrician_contact?: string;
-  health_insurance?: string;
-  health_insurance_number?: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-interface Vaccine {
-  id: string;
-  baby_id: string;
-  name: string;
-  date?: string;
-  dose?: string;
-  completed: boolean;
-  notes?: string;
-  created_at?: string;
-  updated_at?: string;
-}
+import { 
+  MedicalData, 
+  Vaccine 
+} from "@/types";
+import { 
+  getMedicalData, 
+  createMedicalData, 
+  updateMedicalData,
+  getVaccines,
+  createVaccine,
+  updateVaccine,
+  deleteVaccine
+} from "@/lib/supabase-helpers";
 
 const MedicalSidebar = () => {
   const { currentBaby } = useBaby();
@@ -52,14 +36,8 @@ const MedicalSidebar = () => {
     
     setLoading(true);
     try {
-      // Obter dados médicos
-      const { data, error } = await supabase
-        .from('medical_data')
-        .select('*')
-        .eq('baby_id', currentBaby.id)
-        .maybeSingle();
-        
-      if (error && error.code !== 'PGRST116') throw error;
+      // Fetch medical data
+      const data = await getMedicalData(currentBaby.id);
       
       if (data) {
         setMedicalData(data);
@@ -71,16 +49,9 @@ const MedicalSidebar = () => {
         });
       }
       
-      // Obter vacinas
-      const { data: vaccineData, error: vaccineError } = await supabase
-        .from('vaccines')
-        .select('*')
-        .eq('baby_id', currentBaby.id)
-        .order('created_at', { ascending: true });
-        
-      if (vaccineError) throw vaccineError;
-      
-      setVaccines(vaccineData || []);
+      // Fetch vaccines
+      const vaccineData = await getVaccines(currentBaby.id);
+      setVaccines(vaccineData);
     } catch (error) {
       console.error('Error fetching medical data:', error);
       toast({
@@ -98,20 +69,11 @@ const MedicalSidebar = () => {
     
     try {
       if (medicalData?.id) {
-        // Atualizar dados existentes
-        const { error } = await supabase
-          .from('medical_data')
-          .update(tempMedicalData)
-          .eq('id', medicalData.id);
-          
-        if (error) throw error;
+        // Update existing data
+        await updateMedicalData(medicalData.id, tempMedicalData);
       } else {
-        // Criar novo registro
-        const { error } = await supabase
-          .from('medical_data')
-          .insert({ ...tempMedicalData, baby_id: currentBaby.id });
-          
-        if (error) throw error;
+        // Create new record
+        await createMedicalData({ ...tempMedicalData, baby_id: currentBaby.id });
       }
       
       toast({
@@ -119,7 +81,7 @@ const MedicalSidebar = () => {
         description: "Dados médicos salvos com sucesso",
       });
       
-      // Recarregar dados
+      // Reload data
       fetchMedicalData();
       setIsEditing(false);
     } catch (error) {
@@ -136,18 +98,14 @@ const MedicalSidebar = () => {
     if (!currentBaby || !newVaccine.name.trim()) return;
     
     try {
-      const { error } = await supabase
-        .from('vaccines')
-        .insert({ 
-          baby_id: currentBaby.id,
-          name: newVaccine.name,
-          completed: newVaccine.completed
-        });
-        
-      if (error) throw error;
+      await createVaccine({ 
+        baby_id: currentBaby.id,
+        name: newVaccine.name,
+        completed: newVaccine.completed
+      });
       
       setNewVaccine({ name: "", completed: false });
-      fetchMedicalData(); // Recarregar vacinas
+      fetchMedicalData(); // Reload vaccines
     } catch (error) {
       console.error('Error adding vaccine:', error);
       toast({
@@ -160,12 +118,7 @@ const MedicalSidebar = () => {
 
   const toggleVaccine = async (id: string, completed: boolean) => {
     try {
-      const { error } = await supabase
-        .from('vaccines')
-        .update({ completed: !completed })
-        .eq('id', id);
-        
-      if (error) throw error;
+      await updateVaccine(id, { completed: !completed });
       
       setVaccines(vaccines.map(vaccine => 
         vaccine.id === id 
@@ -182,14 +135,9 @@ const MedicalSidebar = () => {
     }
   };
 
-  const deleteVaccine = async (id: string) => {
+  const deleteVaccineItem = async (id: string) => {
     try {
-      const { error } = await supabase
-        .from('vaccines')
-        .delete()
-        .eq('id', id);
-        
-      if (error) throw error;
+      await deleteVaccine(id);
       
       setVaccines(vaccines.filter(vaccine => vaccine.id !== id));
     } catch (error) {
@@ -431,7 +379,7 @@ const MedicalSidebar = () => {
         </CardContent>
       </Card>
       
-      {/* Seção de Vacinas */}
+      {/* Vaccines Section */}
       <Card>
         <CardHeader className="pb-3">
           <div className="flex justify-between items-center">
@@ -444,7 +392,7 @@ const MedicalSidebar = () => {
         
         <CardContent>
           <div className="space-y-4">
-            {/* Formulário para adicionar vacina */}
+            {/* Form to add vaccine */}
             <div className="flex items-center space-x-2">
               <Input
                 placeholder="Adicionar vacina"
@@ -457,7 +405,7 @@ const MedicalSidebar = () => {
               </Button>
             </div>
             
-            {/* Lista de vacinas */}
+            {/* Vaccine list */}
             {vaccines.length === 0 ? (
               <div className="text-center py-4">
                 <p className="text-muted-foreground">Nenhuma vacina registrada</p>
@@ -487,7 +435,7 @@ const MedicalSidebar = () => {
                       variant="ghost" 
                       size="icon" 
                       className="h-6 w-6 text-destructive opacity-60 hover:opacity-100"
-                      onClick={() => deleteVaccine(vaccine.id)}
+                      onClick={() => deleteVaccineItem(vaccine.id)}
                     >
                       <Pill className="h-3.5 w-3.5" />
                     </Button>

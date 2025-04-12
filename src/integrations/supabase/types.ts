@@ -223,6 +223,156 @@ export type Database = {
           },
         ]
       }
+      medical_appointments: {
+        Row: {
+          appointment_date: string
+          appointment_time: string | null
+          appointment_type: string
+          baby_id: string
+          completed: boolean
+          created_at: string
+          doctor_name: string
+          id: string
+          location: string | null
+          notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          appointment_date: string
+          appointment_time?: string | null
+          appointment_type: string
+          baby_id: string
+          completed?: boolean
+          created_at?: string
+          doctor_name: string
+          id?: string
+          location?: string | null
+          notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          appointment_date?: string
+          appointment_time?: string | null
+          appointment_type?: string
+          baby_id?: string
+          completed?: boolean
+          created_at?: string
+          doctor_name?: string
+          id?: string
+          location?: string | null
+          notes?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medical_appointments_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medical_data: {
+        Row: {
+          allergies: string[] | null
+          baby_id: string
+          blood_type: string | null
+          chronic_conditions: string[] | null
+          created_at: string
+          health_insurance: string | null
+          health_insurance_number: string | null
+          id: string
+          medications: string[] | null
+          pediatrician_contact: string | null
+          pediatrician_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          allergies?: string[] | null
+          baby_id: string
+          blood_type?: string | null
+          chronic_conditions?: string[] | null
+          created_at?: string
+          health_insurance?: string | null
+          health_insurance_number?: string | null
+          id?: string
+          medications?: string[] | null
+          pediatrician_contact?: string | null
+          pediatrician_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          allergies?: string[] | null
+          baby_id?: string
+          blood_type?: string | null
+          chronic_conditions?: string[] | null
+          created_at?: string
+          health_insurance?: string | null
+          health_insurance_number?: string | null
+          id?: string
+          medications?: string[] | null
+          pediatrician_contact?: string | null
+          pediatrician_name?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medical_data_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medical_visits: {
+        Row: {
+          baby_id: string
+          created_at: string
+          doctor_name: string
+          height: number | null
+          id: string
+          notes: string
+          updated_at: string
+          visit_date: string
+          visit_type: string
+          weight: number | null
+        }
+        Insert: {
+          baby_id: string
+          created_at?: string
+          doctor_name: string
+          height?: number | null
+          id?: string
+          notes?: string
+          updated_at?: string
+          visit_date: string
+          visit_type: string
+          weight?: number | null
+        }
+        Update: {
+          baby_id?: string
+          created_at?: string
+          doctor_name?: string
+          height?: number | null
+          id?: string
+          notes?: string
+          updated_at?: string
+          visit_date?: string
+          visit_type?: string
+          weight?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medical_visits_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       milestones: {
         Row: {
           age_months: number
@@ -276,6 +426,50 @@ export type Database = {
           user_role?: string
         }
         Relationships: []
+      }
+      vaccines: {
+        Row: {
+          baby_id: string
+          completed: boolean
+          created_at: string
+          date: string | null
+          dose: string | null
+          id: string
+          name: string
+          notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          baby_id: string
+          completed?: boolean
+          created_at?: string
+          date?: string | null
+          dose?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          baby_id?: string
+          completed?: boolean
+          created_at?: string
+          date?: string | null
+          dose?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vaccines_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

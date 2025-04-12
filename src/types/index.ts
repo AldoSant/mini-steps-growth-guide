@@ -1,4 +1,3 @@
-
 export interface Baby {
   id: string;
   user_id: string;
@@ -70,6 +69,61 @@ export interface Event {
   event_date: string;
   event_type: string;
   completed: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+// Medical related types
+export interface MedicalVisit {
+  id: string;
+  baby_id: string;
+  visit_date: string;
+  doctor_name: string;
+  visit_type: string;
+  notes: string;
+  height?: number;
+  weight?: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface MedicalAppointment {
+  id: string;
+  baby_id: string;
+  appointment_date: string;
+  appointment_time?: string;
+  doctor_name: string;
+  appointment_type: string;
+  location?: string;
+  notes?: string;
+  completed: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface MedicalData {
+  id: string;
+  baby_id: string;
+  blood_type?: string;
+  allergies?: string[];
+  chronic_conditions?: string[];
+  medications?: string[];
+  pediatrician_name?: string;
+  pediatrician_contact?: string;
+  health_insurance?: string;
+  health_insurance_number?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface Vaccine {
+  id: string;
+  baby_id: string;
+  name: string;
+  date?: string;
+  dose?: string;
+  completed: boolean;
+  notes?: string;
   created_at?: string;
   updated_at?: string;
 }

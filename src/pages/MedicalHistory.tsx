@@ -8,11 +8,11 @@ import MedicalTimeline from "@/components/medical/MedicalTimeline";
 import UpcomingVisits from "@/components/medical/UpcomingVisits";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BabySidebar from "@/components/dashboard/BabySidebar";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useMobile } from "@/hooks/use-mobile";
 
 const MedicalHistory = () => {
   const { currentBaby } = useBaby();
-  const { isMobile } = useIsMobile();
+  const { isMobile } = useMobile();
 
   return (
     <div className="min-h-screen flex flex-col">

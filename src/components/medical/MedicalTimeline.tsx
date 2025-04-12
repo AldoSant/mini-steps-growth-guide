@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,6 @@ import {
   Edit
 } from "lucide-react";
 import { formatDate } from "@/lib/date-utils";
-import { supabase } from "@/integrations/supabase/client";
 import { useBaby } from "@/context/BabyContext";
 import MedicalVisitForm from "./MedicalVisitForm";
 import {
@@ -22,19 +20,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-
-interface MedicalVisit {
-  id: string;
-  baby_id: string;
-  visit_date: string;
-  doctor_name: string;
-  visit_type: string;
-  notes: string;
-  height?: number;
-  weight?: number;
-  created_at?: string;
-  updated_at?: string;
-}
+import { MedicalVisit } from "@/types";
+import { getMedicalVisits, deleteMedicalVisit } from "@/lib/supabase-helpers";
 
 const MedicalTimeline = () => {
   const { currentBaby } = useBaby();
@@ -49,17 +36,8 @@ const MedicalTimeline = () => {
     
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('medical_visits')
-        .select('*')
-        .eq('baby_id', currentBaby.id)
-        .order('visit_date', { ascending: false });
-        
-      if (error) {
-        throw error;
-      }
-      
-      setMedicalVisits(data || []);
+      const data = await getMedicalVisits(currentBaby.id);
+      setMedicalVisits(data);
     } catch (error) {
       console.error('Error fetching medical visits:', error);
       toast({
@@ -75,12 +53,7 @@ const MedicalTimeline = () => {
   const handleDeleteVisit = async (id: string) => {
     if (window.confirm("Tem certeza que deseja excluir este registro médico?")) {
       try {
-        const { error } = await supabase
-          .from('medical_visits')
-          .delete()
-          .eq('id', id);
-          
-        if (error) throw error;
+        await deleteMedicalVisit(id);
         
         setMedicalVisits(medicalVisits.filter(visit => visit.id !== id));
         toast({

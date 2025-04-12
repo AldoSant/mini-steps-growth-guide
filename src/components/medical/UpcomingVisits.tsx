@@ -1,11 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar, Clock, Plus, CheckCircle2, CalendarClock } from "lucide-react";
 import { formatDate } from "@/lib/date-utils";
-import { supabase } from "@/integrations/supabase/client";
 import { useBaby } from "@/context/BabyContext";
 import MedicalAppointmentForm from "./MedicalAppointmentForm";
 import {
@@ -15,20 +13,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-
-interface MedicalAppointment {
-  id: string;
-  baby_id: string;
-  appointment_date: string;
-  appointment_time?: string;
-  doctor_name: string;
-  appointment_type: string;
-  location?: string;
-  notes?: string;
-  completed: boolean;
-  created_at?: string;
-  updated_at?: string;
-}
+import { MedicalAppointment } from "@/types";
+import { getMedicalAppointments, updateMedicalAppointment, deleteMedicalAppointment } from "@/lib/supabase-helpers";
 
 const UpcomingVisits = () => {
   const { currentBaby } = useBaby();
@@ -43,17 +29,8 @@ const UpcomingVisits = () => {
     
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('medical_appointments')
-        .select('*')
-        .eq('baby_id', currentBaby.id)
-        .order('appointment_date', { ascending: true });
-        
-      if (error) {
-        throw error;
-      }
-      
-      setAppointments(data || []);
+      const data = await getMedicalAppointments(currentBaby.id);
+      setAppointments(data);
     } catch (error) {
       console.error('Error fetching appointments:', error);
       toast({
@@ -68,12 +45,7 @@ const UpcomingVisits = () => {
 
   const toggleAppointmentStatus = async (id: string, completed: boolean) => {
     try {
-      const { error } = await supabase
-        .from('medical_appointments')
-        .update({ completed: !completed })
-        .eq('id', id);
-        
-      if (error) throw error;
+      await updateMedicalAppointment(id, { completed: !completed });
       
       setAppointments(appointments.map(appointment => 
         appointment.id === id 
@@ -100,12 +72,7 @@ const UpcomingVisits = () => {
   const deleteAppointment = async (id: string) => {
     if (window.confirm("Tem certeza que deseja excluir este agendamento?")) {
       try {
-        const { error } = await supabase
-          .from('medical_appointments')
-          .delete()
-          .eq('id', id);
-          
-        if (error) throw error;
+        await deleteMedicalAppointment(id);
         
         setAppointments(appointments.filter(appointment => appointment.id !== id));
         toast({

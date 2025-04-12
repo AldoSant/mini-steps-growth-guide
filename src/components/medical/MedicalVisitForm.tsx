@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,6 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { supabase } from "@/integrations/supabase/client";
 import { useBaby } from "@/context/BabyContext";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
@@ -23,19 +21,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-
-interface MedicalVisit {
-  id: string;
-  baby_id: string;
-  visit_date: string;
-  doctor_name: string;
-  visit_type: string;
-  notes: string;
-  height?: number;
-  weight?: number;
-  created_at?: string;
-  updated_at?: string;
-}
+import { MedicalVisit } from "@/types";
+import { createMedicalVisit, updateMedicalVisit } from "@/lib/supabase-helpers";
 
 interface MedicalVisitFormProps {
   visit?: MedicalVisit;
@@ -53,8 +40,8 @@ const MedicalVisitForm = ({ visit, onComplete }: MedicalVisitFormProps) => {
     doctor_name: visit?.doctor_name || "",
     visit_type: visit?.visit_type || "consulta_rotina",
     notes: visit?.notes || "",
-    height: visit?.height || "",
-    weight: visit?.weight || ""
+    height: visit?.height?.toString() || "",
+    weight: visit?.weight?.toString() || ""
   });
 
   const handleChange = (
@@ -97,30 +84,21 @@ const MedicalVisitForm = ({ visit, onComplete }: MedicalVisitFormProps) => {
         doctor_name: formData.doctor_name,
         visit_type: formData.visit_type,
         notes: formData.notes,
-        height: formData.height ? parseFloat(formData.height as string) : null,
-        weight: formData.weight ? parseFloat(formData.weight as string) : null
+        height: formData.height ? parseFloat(formData.height) : null,
+        weight: formData.weight ? parseFloat(formData.weight) : null
       };
       
       if (visit) {
-        // Atualizar visita existente
-        const { error } = await supabase
-          .from("medical_visits")
-          .update(payload)
-          .eq("id", visit.id);
-          
-        if (error) throw error;
+        // Update existing visit
+        await updateMedicalVisit(visit.id, payload);
         
         toast({
           title: "Visita atualizada",
           description: "Os detalhes da visita foram atualizados com sucesso",
         });
       } else {
-        // Criar nova visita
-        const { error } = await supabase
-          .from("medical_visits")
-          .insert(payload);
-          
-        if (error) throw error;
+        // Create new visit
+        await createMedicalVisit(payload);
         
         toast({
           title: "Visita registrada",
