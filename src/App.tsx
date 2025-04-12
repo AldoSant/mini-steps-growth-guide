@@ -14,6 +14,7 @@ import Dashboard from "./pages/Dashboard";
 import BabyDiary from "./pages/BabyDiary";
 import Activities from "./pages/Activities";
 import Library from "./pages/Library";
+import BabyProfile from "./pages/BabyProfile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
                   <Route path="/diario" element={<BabyDiary />} />
                   <Route path="/atividades" element={<Activities />} />
                   <Route path="/biblioteca" element={<Library />} />
+                  <Route path="/perfil" element={<BabyProfile />} />
                 </Route>
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

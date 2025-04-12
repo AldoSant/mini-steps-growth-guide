@@ -1,153 +1,150 @@
 
-import { Baby, Calendar, Clock, FileText, Plus, User } from "lucide-react";
-import { format, parseISO } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useState } from "react";
+import { Plus, Baby, Edit2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import RegisterBaby from "@/components/RegisterBaby";
+import BabyForm from "@/components/BabyForm";
 import { useBaby } from "@/context/BabyContext";
-import { Baby as BabyType } from "@/types";
-import { getBabyAge } from "@/lib/date-utils";
+import { formatDate, getBabyAge } from "@/lib/date-utils";
+import { toast } from "@/components/ui/use-toast";
+import { useState } from "react";
 
-export const BabySidebar = () => {
-  const { babies, currentBaby, setCurrentBaby } = useBaby();
-  const [registerDialogOpen, setRegisterDialogOpen] = useState(false);
+const BabySidebar = () => {
+  const { babies, currentBaby, setCurrentBaby, deleteBaby } = useBaby();
+  const navigate = useNavigate();
+  const [editBabyId, setEditBabyId] = useState<string | null>(null);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   
-  const formatDate = (dateString: string) => {
-    return format(parseISO(dateString), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
+  const handleDelete = async (id: string) => {
+    if (window.confirm("Tem certeza que deseja excluir este registro?")) {
+      const success = await deleteBaby(id);
+      if (success) {
+        toast({
+          title: "Bebê removido",
+          description: "O registro foi excluído com sucesso.",
+        });
+      }
+    }
   };
-  
+
   return (
-    <div className="lg:col-span-1 space-y-6">
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex justify-between items-center">
-            <span>Bebês</span>
-            <Dialog open={registerDialogOpen} onOpenChange={setRegisterDialogOpen}>
+    <div className="lg:col-span-1">
+      <Card className="mb-6">
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-medium">Meus bebês</h2>
+            <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
               <DialogTrigger asChild>
-                <Button size="icon" variant="ghost">
-                  <Plus size={16} />
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <Plus className="h-4 w-4" />
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Registrar novo bebê</DialogTitle>
+                  <DialogTitle>Adicionar bebê</DialogTitle>
                 </DialogHeader>
-                <RegisterBaby />
+                <RegisterBaby onComplete={() => setAddDialogOpen(false)} />
               </DialogContent>
             </Dialog>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
+          </div>
+
+          <div className="space-y-3">
             {babies.map((baby) => (
-              <div 
+              <div
                 key={baby.id}
-                className={`flex items-center p-3 rounded-lg cursor-pointer transition-colors ${
-                  currentBaby && currentBaby.id === baby.id
-                    ? "bg-minipassos-purple text-white"
-                    : "hover:bg-gray-100"
+                className={`p-3 rounded-md cursor-pointer transition-colors ${
+                  currentBaby?.id === baby.id
+                    ? "bg-primary/10 border border-primary/20"
+                    : "hover:bg-accent"
                 }`}
                 onClick={() => setCurrentBaby(baby)}
               >
-                <div className="mr-3 bg-white rounded-full p-1">
-                  <Baby size={20} className="text-minipassos-purple" />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div
+                      className={`w-2 h-2 rounded-full mr-2 ${
+                        baby.gender === "M"
+                          ? "bg-blue-500"
+                          : baby.gender === "F"
+                          ? "bg-pink-500"
+                          : "bg-purple-500"
+                      }`}
+                    ></div>
+                    <span className="font-medium">{baby.name}</span>
+                  </div>
+
+                  <Dialog open={editDialogOpen && editBabyId === baby.id} onOpenChange={(open) => {
+                    setEditDialogOpen(open);
+                    if (!open) setEditBabyId(null);
+                  }}>
+                    <DialogTrigger asChild onClick={(e) => {
+                      e.stopPropagation();
+                      setEditBabyId(baby.id);
+                    }}>
+                      <Button variant="ghost" size="icon" className="h-6 w-6 opacity-70 hover:opacity-100">
+                        <Edit2 className="h-3 w-3" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Editar bebê</DialogTitle>
+                      </DialogHeader>
+                      <BabyForm
+                        baby={baby}
+                        onComplete={() => {
+                          setEditDialogOpen(false);
+                          setEditBabyId(null);
+                        }}
+                      />
+                    </DialogContent>
+                  </Dialog>
                 </div>
-                <div>
-                  <h3 className={`font-medium ${
-                    currentBaby && currentBaby.id === baby.id
-                      ? "text-white"
-                      : "text-gray-800"
-                  }`}>
-                    {baby.name}
-                  </h3>
-                  <p className={`text-xs ${
-                    currentBaby && currentBaby.id === baby.id
-                      ? "text-white/80"
-                      : "text-gray-500"
-                  }`}>
-                    {formatDate(baby.birth_date)}
-                  </p>
+
+                <div className="mt-1 text-xs text-muted-foreground">
+                  {getBabyAge(baby)}
+                </div>
+
+                <div className="mt-2 text-xs text-muted-foreground">
+                  Nascido em {formatDate(baby.birth_date).split(" de ").slice(0, -1).join(" de ")}
                 </div>
               </div>
             ))}
+
+            {babies.length === 0 && (
+              <div className="text-center py-4 text-muted-foreground">
+                <p className="text-sm">Nenhum bebê cadastrado</p>
+                <p className="text-xs mt-1">
+                  Adicione um bebê para começar a acompanhar o desenvolvimento
+                </p>
+              </div>
+            )}
           </div>
         </CardContent>
+
+        {currentBaby && (
+          <CardFooter className="flex justify-between p-4 pt-0">
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full border-minipassos-purple text-minipassos-purple hover:bg-minipassos-purple/10"
+              onClick={() => navigate("/perfil")}
+            >
+              <Baby className="mr-2 h-4 w-4" />
+              Ver perfil completo
+            </Button>
+          </CardFooter>
+        )}
       </Card>
-      
-      {currentBaby && <BabyInfoCard baby={currentBaby} formatDate={formatDate} />}
     </div>
-  );
-};
-
-interface BabyInfoCardProps {
-  baby: BabyType;
-  formatDate: (date: string) => string;
-}
-
-const BabyInfoCard = ({ baby, formatDate }: BabyInfoCardProps) => {
-  return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle>Informações</CardTitle>
-        <CardDescription>
-          Detalhes de {baby.name}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="flex justify-between">
-            <div className="flex items-center text-sm text-gray-500">
-              <Clock size={16} className="mr-2" />
-              <span>Idade</span>
-            </div>
-            <span className="text-sm font-medium">{getBabyAge(baby)}</span>
-          </div>
-          
-          <div className="flex justify-between">
-            <div className="flex items-center text-sm text-gray-500">
-              <Calendar size={16} className="mr-2" />
-              <span>Nascimento</span>
-            </div>
-            <span className="text-sm font-medium">
-              {formatDate(baby.birth_date)}
-            </span>
-          </div>
-          
-          <div className="flex justify-between">
-            <div className="flex items-center text-sm text-gray-500">
-              <User size={16} className="mr-2" />
-              <span>Sexo</span>
-            </div>
-            <span className="text-sm font-medium capitalize">
-              {baby.gender}
-            </span>
-          </div>
-          
-          <div className="flex justify-between">
-            <div className="flex items-center text-sm text-gray-500">
-              <FileText size={16} className="mr-2" />
-              <span>Peso ao nascer</span>
-            </div>
-            <span className="text-sm font-medium">
-              {Number(baby.weight).toLocaleString()} kg
-            </span>
-          </div>
-          
-          <div className="flex justify-between">
-            <div className="flex items-center text-sm text-gray-500">
-              <FileText size={16} className="mr-2" />
-              <span>Altura ao nascer</span>
-            </div>
-            <span className="text-sm font-medium">
-              {Number(baby.height).toLocaleString()} cm
-            </span>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
   );
 };
 
