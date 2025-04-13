@@ -12,29 +12,28 @@ export default function PWAInstallBanner() {
   const [showBanner, setShowBanner] = useState(false);
   const { toast } = useToast();
   
-  // Check if the banner was previously dismissed in this session
+  // Verifique se o banner foi dispensado anteriormente nesta sessão
   useEffect(() => {
     const wasDismissed = localStorage.getItem('pwa-banner-dismissed');
     
-    // Force display the banner if installable (for debugging)
-    if (isInstallable && !isInstalled) {
-      console.log("PWA is installable and not installed - should show banner");
-      // Small delay to ensure it appears after page load
+    if (isInstallable && !isInstalled && !wasDismissed) {
+      console.log("PWA é instalável e não instalado - mostrando banner");
+      // Pequeno atraso para garantir que apareça após o carregamento da página
       const timer = setTimeout(() => {
         setShowBanner(true);
-        console.log("Setting showBanner to true");
+        console.log("Definindo showBanner como true");
       }, 2000);
       
       return () => clearTimeout(timer);
     } else {
-      console.log("PWA status:", { isInstallable, isInstalled });
+      console.log("Status do PWA:", { isInstallable, isInstalled, wasDismissed });
     }
   }, [isInstallable, isInstalled]);
 
   const handleDismiss = () => {
     setDismissed(true);
     setShowBanner(false);
-    // Store dismissal in localStorage to prevent showing again in this session
+    // Armazene a dispensa no localStorage para evitar mostrar novamente nesta sessão
     localStorage.setItem('pwa-banner-dismissed', 'true');
     toast({
       title: "Notificação ocultada",
@@ -50,7 +49,7 @@ export default function PWAInstallBanner() {
         description: "Siga as instruções para instalar o MiniPassos"
       });
     } catch (error) {
-      console.error("Installation error:", error);
+      console.error("Erro na instalação:", error);
       toast({
         title: "Erro na instalação",
         description: "Não foi possível iniciar a instalação",

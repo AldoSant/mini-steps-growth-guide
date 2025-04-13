@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
 import { getBabyAge } from "@/lib/date-utils";
-import { Calendar, BookOpen, Layout, User, Stethoscope } from "lucide-react";
+import { Calendar, BookOpen, Layout, User, Stethoscope, Library } from "lucide-react";
 
 const BabySidebar = () => {
   const { currentBaby, babies, setCurrentBaby } = useBaby();
@@ -61,6 +61,7 @@ const BabySidebar = () => {
               { icon: Layout, label: 'Dashboard', path: '/dashboard' },
               { icon: Calendar, label: 'Diário', path: '/diario' },
               { icon: BookOpen, label: 'Atividades', path: '/atividades' },
+              { icon: Library, label: 'Biblioteca', path: '/biblioteca' },
               { icon: Stethoscope, label: 'Histórico Médico', path: '/historico-medico' },
               { icon: User, label: 'Perfil', path: '/perfil' },
             ].map((item) => (
