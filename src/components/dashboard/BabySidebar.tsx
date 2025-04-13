@@ -1,19 +1,23 @@
+
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useBaby } from "@/context/BabyContext";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
-import { calculateAge } from "@/lib/utils";
+import { getBabyAge } from "@/lib/date-utils";
 import { Calendar, BookOpen, Layout, User, Stethoscope } from "lucide-react";
 
 const BabySidebar = () => {
-  const { currentBaby, babies, switchBaby } = useBaby();
+  const { currentBaby, babies, setCurrentBaby } = useBaby();
   const navigate = useNavigate();
   const location = useLocation();
   
   const handleBabySwitch = (babyId: string) => {
-    switchBaby(babyId);
+    const selectedBaby = babies.find(baby => baby.id === babyId);
+    if (selectedBaby) {
+      setCurrentBaby(selectedBaby);
+    }
   };
 
   return (
@@ -42,7 +46,7 @@ const BabySidebar = () => {
             <div>
               <p className="font-medium text-gray-700">{currentBaby.name}</p>
               <p className="text-sm text-muted-foreground">
-                {calculateAge(currentBaby.birth_date)}
+                {getBabyAge(currentBaby)}
               </p>
             </div>
           </div>
