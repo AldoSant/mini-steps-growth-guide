@@ -14,6 +14,11 @@ declare global {
   interface WindowEventMap {
     beforeinstallprompt: BeforeInstallPromptEvent;
   }
+  
+  // Add standalone to the Navigator interface
+  interface Navigator {
+    standalone?: boolean;
+  }
 }
 
 export function usePWA() {
