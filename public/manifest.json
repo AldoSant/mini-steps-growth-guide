@@ -37,5 +37,16 @@
   "prefer_related_applications": false,
   "scope": "/",
   "categories": ["education", "health", "lifestyle", "parenting"],
-  "screenshots": []
+  "screenshots": [
+    {
+      "src": "screenshot1.png",
+      "sizes": "1280x720",
+      "type": "image/png"
+    },
+    {
+      "src": "screenshot2.png",
+      "sizes": "1280x720",
+      "type": "image/png"
+    }
+  ]
 }

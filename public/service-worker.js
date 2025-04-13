@@ -1,6 +1,6 @@
 
 // Service Worker para MiniPassos PWA
-const CACHE_NAME = 'minipassos-cache-v2';
+const CACHE_NAME = 'minipassos-cache-v3';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -45,8 +45,6 @@ self.addEventListener('activate', (event) => {
 
 // Fetch event - network-first strategy with cache fallback
 self.addEventListener('fetch', (event) => {
-  console.log('Service Worker: Fetch', event.request.url);
-  
   event.respondWith(
     // Try network first
     fetch(event.request)
@@ -61,7 +59,6 @@ self.addEventListener('fetch', (event) => {
 
         caches.open(CACHE_NAME)
           .then((cache) => {
-            console.log('Service Worker: Cacheando novo recurso', event.request.url);
             cache.put(event.request, responseToCache);
           });
 
@@ -79,7 +76,7 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('push', (event) => {
   console.log('Service Worker: Push recebido');
   
-  const data = event.data.json();
+  const data = event.data ? event.data.json() : {};
   const title = data.title || 'MiniPassos';
   
   const options = {

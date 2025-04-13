@@ -9,6 +9,7 @@ import { BabyProvider } from "./context/BabyContext";
 import { MilestoneProvider } from "./context/MilestoneContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PWAInstallBanner from "./components/PWAInstallBanner";
+import DataInitializer from "./components/DataInitializer";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -49,6 +50,7 @@ const App = () => (
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              <DataInitializer />
               <PWAInstallBanner />
             </BrowserRouter>
           </TooltipProvider>
