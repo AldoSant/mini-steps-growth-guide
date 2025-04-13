@@ -25,6 +25,7 @@ export function usePWA() {
     // Check if app is already installed
     if (window.matchMedia('(display-mode: standalone)').matches) {
       setIsInstalled(true);
+      console.log('PWA is already installed');
     }
 
     // Listen for the beforeinstallprompt event
@@ -34,6 +35,7 @@ export function usePWA() {
       // Stash the event so it can be triggered later
       setInstallPrompt(e);
       setIsInstallable(true);
+      console.log('PWA is installable', e);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -45,6 +47,11 @@ export function usePWA() {
       setInstallPrompt(null);
       console.log('MiniPassos foi instalado com sucesso!');
     });
+
+    // Debug information
+    if (navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+      console.log('Aplicativo já está instalado em modo standalone');
+    }
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -71,8 +78,11 @@ export function usePWA() {
 
     // Reset the installPrompt to null
     setInstallPrompt(null);
-    setIsInstallable(false);
   };
 
-  return { isInstallable, isInstalled, promptInstall };
+  return { 
+    isInstallable, 
+    isInstalled, 
+    promptInstall 
+  };
 }

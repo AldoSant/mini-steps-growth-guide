@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Download, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -8,8 +8,30 @@ import { usePWA } from '@/hooks/usePWA';
 export default function PWAInstallBanner() {
   const { isInstallable, isInstalled, promptInstall } = usePWA();
   const [dismissed, setDismissed] = useState(false);
+  const [showBanner, setShowBanner] = useState(false);
+  
+  // Check if the banner was previously dismissed in this session
+  useEffect(() => {
+    const wasDismissed = localStorage.getItem('pwa-banner-dismissed');
+    
+    if (!wasDismissed && isInstallable && !isInstalled) {
+      // Small delay to ensure it appears after page load
+      const timer = setTimeout(() => {
+        setShowBanner(true);
+      }, 2000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isInstallable, isInstalled]);
 
-  if (!isInstallable || isInstalled || dismissed) {
+  const handleDismiss = () => {
+    setDismissed(true);
+    setShowBanner(false);
+    // Store dismissal in localStorage to prevent showing again in this session
+    localStorage.setItem('pwa-banner-dismissed', 'true');
+  };
+
+  if (!showBanner || dismissed || !isInstallable || isInstalled) {
     return null;
   }
 
@@ -20,7 +42,7 @@ export default function PWAInstallBanner() {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 50 }}
         transition={{ duration: 0.3 }}
-        className="fixed bottom-16 inset-x-0 mx-auto w-11/12 max-w-md z-50"
+        className="fixed bottom-4 inset-x-0 mx-auto w-11/12 max-w-md z-50"
       >
         <div className="bg-white p-4 rounded-lg shadow-lg border border-minipassos-purple/20 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -37,7 +59,8 @@ export default function PWAInstallBanner() {
               size="sm" 
               variant="outline" 
               className="h-8 w-8 p-0" 
-              onClick={() => setDismissed(true)}
+              onClick={handleDismiss}
+              aria-label="Fechar"
             >
               <X size={16} />
               <span className="sr-only">Fechar</span>

@@ -8,7 +8,6 @@ import { AuthProvider } from "./context/AuthContext";
 import { BabyProvider } from "./context/BabyContext";
 import { MilestoneProvider } from "./context/MilestoneContext";
 import ProtectedRoute from "./components/ProtectedRoute";
-import FloatingMenu from "./components/FloatingMenu";
 import PWAInstallBanner from "./components/PWAInstallBanner";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -50,7 +49,6 @@ const App = () => (
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
-              <FloatingMenu />
               <PWAInstallBanner />
             </BrowserRouter>
           </TooltipProvider>
