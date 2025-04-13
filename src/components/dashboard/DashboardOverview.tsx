@@ -1,11 +1,8 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 import MilestoneTimeline from "@/components/MilestoneTimeline";
 import { Milestone } from "@/types";
-import { useState } from "react";
-import DataInitializer from "@/components/DataInitializer";
 import { useAuth } from "@/context/AuthContext";
 
 interface DashboardOverviewProps {
@@ -15,7 +12,6 @@ interface DashboardOverviewProps {
 }
 
 const DashboardOverview = ({ currentBabyName, preparedMilestones, currentAgeInMonths }: DashboardOverviewProps) => {
-  const [dataDialogOpen, setDataDialogOpen] = useState(false);
   const { user } = useAuth();
   
   return (
@@ -96,12 +92,6 @@ const DashboardOverview = ({ currentBabyName, preparedMilestones, currentAgeInMo
           </CardContent>
         </Card>
       </div>
-      
-      <Dialog open={dataDialogOpen} onOpenChange={setDataDialogOpen}>
-        <DialogContent>
-          <DataInitializer />
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
