@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
-import { useMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,11 +19,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Menu, LogOut, User, FileText, Home, BookOpen, Calendar, Baby, Stethoscope } from "lucide-react";
+import { Menu, LogOut, User, FileText, Home, BookOpen, Calendar, Baby, Stethoscope, CreditCard } from "lucide-react";
 
 const Header = () => {
   const { user, signOut } = useAuth();
-  const { isMobile } = useMobile();
+  const isMobile = useIsMobile();
   const location = useLocation();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
@@ -40,12 +40,13 @@ const Header = () => {
     { name: "Atividades", path: "/atividades", icon: <BookOpen className="h-5 w-5 mr-2" /> },
     { name: "Histórico Médico", path: "/historico-medico", icon: <Stethoscope className="h-5 w-5 mr-2" /> },
     { name: "Perfil", path: "/perfil", icon: <Baby className="h-5 w-5 mr-2" /> },
+    { name: "Assinatura", path: "/assinatura", icon: <CreditCard className="h-5 w-5 mr-2" /> },
   ];
 
   return (
     <header className="sticky top-0 z-30 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-8">
+      <div className="container flex h-14 md:h-16 items-center justify-between">
+        <div className="flex items-center gap-4 md:gap-8">
           <Link to="/" className="flex items-center gap-2">
             <img src="/logo.png" alt="MiniPassos" className="h-8" />
             <span className="text-xl font-bold text-primary hidden sm:inline-block">
@@ -54,7 +55,7 @@ const Header = () => {
           </Link>
 
           {!isMobile && user && (
-            <nav className="hidden md:flex items-center gap-6 text-sm">
+            <nav className="hidden md:flex items-center gap-4 text-sm">
               {routes.slice(1).map((route) => (
                 <Link
                   key={route.path}
@@ -79,18 +80,18 @@ const Header = () => {
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent>
+            <SheetContent side="right">
               <SheetHeader>
                 <SheetTitle>MiniPassos</SheetTitle>
               </SheetHeader>
               <div className="py-4">
-                <nav className="flex flex-col gap-3">
+                <nav className="flex flex-col gap-1">
                   {routes.map((route) => (
                     <Link
                       key={route.path}
                       to={route.path}
                       onClick={() => setIsOpen(false)}
-                      className={`flex items-center py-2 px-3 rounded-md transition-colors ${
+                      className={`flex items-center py-3 px-3 rounded-md transition-colors ${
                         location.pathname === route.path
                           ? "bg-accent text-accent-foreground"
                           : "hover:bg-accent hover:text-accent-foreground"
@@ -152,6 +153,10 @@ const Header = () => {
                   <DropdownMenuItem onClick={() => navigate("/dashboard")}>
                     <FileText className="h-4 w-4 mr-2" />
                     Dashboard
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/assinatura")}>
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    Assinatura
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut}>

@@ -1,0 +1,37 @@
+
+{
+  "short_name": "MiniPassos",
+  "name": "MiniPassos - Acompanhamento do Desenvolvimento Infantil",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    },
+    {
+      "src": "maskable_icon.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#a78bfa",
+  "background_color": "#ffffff",
+  "orientation": "portrait",
+  "description": "Acompanhe o desenvolvimento do seu bebê com o MiniPassos",
+  "dir": "ltr",
+  "lang": "pt-BR",
+  "prefer_related_applications": false
+}

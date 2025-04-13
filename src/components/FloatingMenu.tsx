@@ -22,11 +22,9 @@ export default function FloatingMenu() {
     { icon: <CreditCard size={20} />, label: "Assinatura", path: "/assinatura", color: "bg-indigo-500" },
   ];
 
-  // Não mostrar em telas muito pequenas para não interferir com outras UIs
-  if (isMobile) return null;
-
+  // Mostrar em telas pequenas (mobile first)
   return (
-    <div className="fixed right-4 bottom-4 z-50">
+    <div className="fixed right-4 bottom-4 z-50 safe-area-bottom">
       <AnimatePresence>
         {isOpen && (
           <div className="absolute bottom-16 right-0 flex flex-col-reverse gap-2">

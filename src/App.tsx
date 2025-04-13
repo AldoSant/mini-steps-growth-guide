@@ -9,6 +9,7 @@ import { BabyProvider } from "./context/BabyContext";
 import { MilestoneProvider } from "./context/MilestoneContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import FloatingMenu from "./components/FloatingMenu";
+import PWAInstallBanner from "./components/PWAInstallBanner";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -50,6 +51,7 @@ const App = () => (
                 <Route path="*" element={<NotFound />} />
               </Routes>
               <FloatingMenu />
+              <PWAInstallBanner />
             </BrowserRouter>
           </TooltipProvider>
         </MilestoneProvider>
