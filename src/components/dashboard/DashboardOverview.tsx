@@ -127,7 +127,7 @@ const DashboardOverview = ({ currentBabyName, preparedMilestones, currentAgeInMo
       
       <Dialog open={dataDialogOpen} onOpenChange={setDataDialogOpen}>
         <DialogContent>
-          <DataInitializer onClose={() => setDataDialogOpen(false)} />
+          <DataInitializer />
         </DialogContent>
       </Dialog>
     </div>
