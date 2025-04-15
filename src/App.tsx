@@ -32,7 +32,7 @@ const queryClient = new QueryClient({
       retry: 3,
       retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
       staleTime: 5 * 60 * 1000, // 5 minutos
-      cacheTime: 24 * 60 * 60 * 1000, // 24 horas (para suporte offline)
+      gcTime: 24 * 60 * 60 * 1000, // 24 horas (para suporte offline)
       refetchOnWindowFocus: false, // Melhor UX para PWA
       refetchOnMount: true
     },

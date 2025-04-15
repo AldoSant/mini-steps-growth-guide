@@ -21,10 +21,16 @@ export async function saveForSync<T>(cacheName: string, key: string, data: T): P
     
     await cache.put(request, response);
     
-    // Registra para sincronização quando online
-    if ('serviceWorker' in navigator && 'SyncManager' in window) {
+    // Registra para sincronização quando online usando postMessage em vez de .sync
+    if ('serviceWorker' in navigator) {
       const registration = await navigator.serviceWorker.ready;
-      await registration.sync.register(`sync-${cacheName}`);
+      if (registration.active) {
+        registration.active.postMessage({
+          type: 'PENDING_SYNC',
+          cache: cacheName,
+          key: key
+        });
+      }
     }
     
     return true;

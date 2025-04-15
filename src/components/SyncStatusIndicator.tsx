@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
-import { CloudSync, CloudOff } from "lucide-react";
+import { Cloud, CloudOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
@@ -56,7 +56,7 @@ const SyncStatusIndicator: React.FC = () => {
             disabled={isSyncing || !isOnline}
           >
             {isSyncing ? (
-              <CloudSync className="h-4 w-4 text-blue-500 animate-spin" />
+              <Cloud className="h-4 w-4 text-blue-500 animate-spin" />
             ) : (
               <CloudOff className="h-4 w-4 text-yellow-500" />
             )}

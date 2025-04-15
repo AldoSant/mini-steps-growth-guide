@@ -2,7 +2,7 @@
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { usePWA } from "@/hooks/usePWA";
 import { useEffect, useState } from "react";
-import { ArrowUpCircle, CloudDown, CloudOff, WifiOff, Wifi } from "lucide-react";
+import { ArrowUpCircle, Cloud, CloudOff, WifiOff, Wifi } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import SyncStatusIndicator from "./SyncStatusIndicator";

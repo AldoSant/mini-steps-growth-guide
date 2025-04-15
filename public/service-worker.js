@@ -1,4 +1,3 @@
-
 // Service Worker para MiniPassos PWA
 const CACHE_NAME = 'minipassos-cache-v5';
 const OFFLINE_URL = '/offline.html';
@@ -425,5 +424,22 @@ async function performSync(cacheName) {
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
+  }
+  
+  // Handle sync requests coming from postMessage
+  if (event.data && event.data.type === 'SYNC_REQUEST') {
+    const cachesToSync = event.data.caches || [];
+    
+    // Perform sync operations for each cache
+    cachesToSync.forEach(cacheName => {
+      performSync(cacheName);
+    });
+  }
+  
+  // Handle pending sync notifications
+  if (event.data && event.data.type === 'PENDING_SYNC') {
+    console.log(`Service Worker: Marked data for future sync in ${event.data.cache}`);
+    // We don't need to do anything here, as the data is already stored in cache
+    // Just for logging/debugging purposes
   }
 });

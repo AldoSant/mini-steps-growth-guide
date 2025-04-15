@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from "@/hooks/use-toast";
-import { Wifi, WifiOff, CloudSync } from 'lucide-react';
+import { Wifi, WifiOff, Cloud } from 'lucide-react';
 
 /**
  * Hook para monitorar o status de conexão de rede do usuário
@@ -40,15 +40,19 @@ export const useNetworkStatus = () => {
 
   // Tenta sincronizar dados quando a conexão é restabelecida
   const syncData = useCallback(async () => {
-    if (!('serviceWorker' in navigator) || !('SyncManager' in window)) return false;
+    if (!('serviceWorker' in navigator)) return false;
     
     try {
       setIsSyncing(true);
       const registration = await navigator.serviceWorker.ready;
       
-      // Registra tarefas de sincronização
-      await registration.sync.register('sync-diary-entries');
-      await registration.sync.register('sync-medical-data');
+      // Em vez de usar o .sync, vamos enviar uma mensagem para o service worker
+      if (registration.active) {
+        registration.active.postMessage({
+          type: 'SYNC_REQUEST',
+          caches: ['diary-entries-sync', 'medical-data-sync']
+        });
+      }
       
       // Espera um tempo para a sincronização ocorrer
       setTimeout(() => {
@@ -77,7 +81,7 @@ export const useNetworkStatus = () => {
           title: "Sincronizando dados",
           description: (
             <div className="flex items-center">
-              <CloudSync className="h-4 w-4 text-blue-500 mr-2 animate-spin" />
+              <Cloud className="h-4 w-4 text-blue-500 mr-2 animate-spin" />
               <span>Sincronizando dados salvos offline...</span>
             </div>
           ),
