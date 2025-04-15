@@ -1,6 +1,6 @@
 
 // Service Worker para MiniPassos PWA
-const CACHE_NAME = 'minipassos-cache-v4';
+const CACHE_NAME = 'minipassos-cache-v5';
 const OFFLINE_URL = '/offline.html';
 
 // Recursos para cache imediato durante a instalação
@@ -55,7 +55,7 @@ self.addEventListener('install', (event) => {
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
   console.log('Service Worker: Ativado');
-  const cacheWhitelist = [CACHE_NAME];
+  const cacheWhitelist = [CACHE_NAME, 'diary-entries-sync', 'medical-data-sync'];
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
@@ -82,95 +82,169 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Estratégia network-first para API, stale-while-revalidate para todos os outros recursos
+// Helper functions for improved readability and maintenance
+function isApiOrDynamicRequest(url) {
+  return url.href.includes('supabase.co') || 
+         url.pathname.startsWith('/api/') || 
+         url.searchParams.has('_data');
+}
+
+function isNavigationRequest(request) {
+  return request.mode === 'navigate' && 
+         request.destination === 'document';
+}
+
+function isStaticAsset(url) {
+  return url.pathname.match(/\.(js|css|png|jpg|jpeg|svg|ico|woff2?)$/) || 
+         ADDITIONAL_ASSETS.includes(url.pathname);
+}
+
+function isOfflineStorageRequest(url) {
+  return url.pathname.startsWith('/__offline/');
+}
+
+// Improved fetch event handling with better organization
 self.addEventListener('fetch', (event) => {
   const requestUrl = new URL(event.request.url);
-
-  // Não interceptar chamadas de API do Supabase - deixe passar direto
-  if (requestUrl.href.includes('supabase.co') || event.request.method !== 'GET') {
+  
+  // Don't intercept these requests
+  if (event.request.method !== 'GET' || isApiOrDynamicRequest(requestUrl)) {
     return;
   }
   
-  // Para navegação HTML, use network-first strategy com fallback para offline page
-  if (event.request.mode === 'navigate') {
+  // Special handling for navigation requests (HTML pages)
+  if (isNavigationRequest(event.request)) {
     event.respondWith(
-      fetch(event.request)
-        .then(response => {
-          // Armazene em cache uma cópia da resposta
-          const responseToCache = response.clone();
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, responseToCache);
-          });
-          return response;
-        })
-        .catch(() => {
-          // Se o fetch falhar, tente retornar do cache
-          return caches.match(event.request)
-            .then(cachedResponse => {
-              if (cachedResponse) {
-                return cachedResponse;
-              }
-              // Se não houver versão em cache, retorne a página offline
-              console.log('Service Worker: Servindo página offline');
-              return caches.match(OFFLINE_URL);
-            });
-        })
+      networkWithCacheFallbackAndOffline(event.request)
     );
     return;
   }
   
-  // Para recursos estáticos, use stale-while-revalidate
-  if (
-    requestUrl.pathname.match(/\.(js|css|png|jpg|jpeg|svg|ico|woff2?)$/) ||
-    ADDITIONAL_ASSETS.includes(requestUrl.pathname)
-  ) {
+  // For static assets, use stale-while-revalidate
+  if (isStaticAsset(requestUrl)) {
     event.respondWith(
-      caches.match(event.request)
-        .then(cachedResponse => {
-          // Tenta obter do cache primeiro enquanto atualiza o cache em segundo plano
-          const fetchPromise = fetch(event.request)
-            .then(networkResponse => {
-              // Se a resposta for válida, atualize o cache
-              if (networkResponse && networkResponse.ok) {
-                const clonedResponse = networkResponse.clone();
-                caches.open(CACHE_NAME).then(cache => {
-                  cache.put(event.request, clonedResponse);
-                });
-              }
-              return networkResponse;
-            })
-            .catch(error => {
-              console.log('Fetch falhou:', error);
-              return new Response('Erro de rede', {
-                status: 408,
-                headers: new Headers({ 'Content-Type': 'text/plain' }),
-              });
-            });
-
-          return cachedResponse || fetchPromise;
-        })
+      staleWhileRevalidate(event.request)
     );
     return;
   }
   
-  // Para todos os outros recursos, tente network primeiro com fallback para cache
+  // Handle offline storage requests
+  if (isOfflineStorageRequest(requestUrl)) {
+    event.respondWith(caches.match(event.request));
+    return;
+  }
+  
+  // For all other requests, try network first with cache fallback
   event.respondWith(
-    fetch(event.request)
-      .then(response => {
-        // Válido apenas para respostas bem-sucedidas (status 200-299)
-        if (response && response.ok) {
-          const clonedResponse = response.clone();
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, clonedResponse);
-          });
-        }
-        return response;
-      })
-      .catch(() => {
-        return caches.match(event.request);
-      })
+    networkWithCacheFallback(event.request)
   );
 });
+
+// Network-first strategy with offline fallback for HTML
+async function networkWithCacheFallbackAndOffline(request) {
+  try {
+    const networkResponse = await fetch(request);
+    const responseToCache = networkResponse.clone();
+    
+    // Store in cache if valid
+    if (networkResponse && networkResponse.ok) {
+      const cache = await caches.open(CACHE_NAME);
+      cache.put(request, responseToCache);
+    }
+    
+    return networkResponse;
+  } catch (error) {
+    // If offline, try to return from cache
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+    
+    // If no cached version, return offline page
+    return caches.match(OFFLINE_URL);
+  }
+}
+
+// Network first with cache fallback for non-HTML
+async function networkWithCacheFallback(request) {
+  try {
+    const networkResponse = await fetch(request);
+    
+    // Store in cache if valid
+    if (networkResponse && networkResponse.ok) {
+      const cache = await caches.open(CACHE_NAME);
+      cache.put(request, networkResponse.clone());
+    }
+    
+    return networkResponse;
+  } catch (error) {
+    // If offline, try to return from cache
+    return caches.match(request);
+  }
+}
+
+// Stale-while-revalidate for static assets
+async function staleWhileRevalidate(request) {
+  const cachedResponse = await caches.match(request);
+  
+  // Return cached response immediately if available
+  if (cachedResponse) {
+    // Update cache in background
+    updateCache(request);
+    return cachedResponse;
+  }
+  
+  // If not in cache, fetch from network
+  const networkResponsePromise = fetch(request);
+  
+  try {
+    const networkResponse = await networkResponsePromise;
+    
+    // Cache the new response for next time
+    if (networkResponse && networkResponse.ok) {
+      const clonedResponse = networkResponse.clone();
+      caches.open(CACHE_NAME).then(cache => {
+        cache.put(request, clonedResponse);
+        notifyClientsOfUpdate(request.url);
+      });
+    }
+    
+    return networkResponse;
+  } catch (error) {
+    // If fetch fails and nothing in cache, return a simple error response
+    return new Response('Recurso indisponível no momento', { 
+      status: 408, 
+      headers: new Headers({ 'Content-Type': 'text/plain' })
+    });
+  }
+}
+
+// Update cache in background
+async function updateCache(request) {
+  try {
+    const networkResponse = await fetch(request);
+    
+    if (networkResponse && networkResponse.ok) {
+      const cache = await caches.open(CACHE_NAME);
+      await cache.put(request, networkResponse);
+      notifyClientsOfUpdate(request.url);
+    }
+  } catch (error) {
+    console.log('Falha ao atualizar cache em segundo plano:', error);
+  }
+}
+
+// Notify clients about cache updates
+function notifyClientsOfUpdate(url) {
+  self.clients.matchAll().then(clients => {
+    clients.forEach(client => {
+      client.postMessage({
+        type: 'CACHE_UPDATED',
+        url: url
+      });
+    });
+  });
+}
 
 // Push event - handle notifications
 self.addEventListener('push', (event) => {
@@ -242,52 +316,112 @@ self.addEventListener('notificationclick', (event) => {
   );
 });
 
-// Evento de sincronização em segundo plano
+// Improved sync event handling
 self.addEventListener('sync', function(event) {
-  if (event.tag === 'sync-diary-entries') {
-    event.waitUntil(syncDiaryEntries());
-  } else if (event.tag === 'sync-medical-data') {
-    event.waitUntil(syncMedicalData());
+  console.log('Background sync event:', event.tag);
+  
+  if (event.tag.startsWith('sync-')) {
+    const cacheName = event.tag.replace('sync-', '');
+    event.waitUntil(performSync(cacheName));
   }
 });
 
-// Simula funcionalidade de envio de cache para sincronização
-async function syncDiaryEntries() {
+// Improved sync function with better error handling and retry logic
+async function performSync(cacheName) {
+  console.log(`Sincronizando dados do cache: ${cacheName}`);
+  
   try {
-    const cache = await caches.open('diary-entries-sync');
+    const cache = await caches.open(cacheName);
     const requests = await cache.keys();
+    let successCount = 0;
+    let failCount = 0;
+    
+    if (requests.length === 0) {
+      console.log(`Nenhum dado para sincronizar em ${cacheName}`);
+      return;
+    }
+    
+    console.log(`Encontrados ${requests.length} itens para sincronizar`);
     
     for (const request of requests) {
       try {
-        const response = await cache.match(request);
-        const data = await response.json();
+        // Extrair o ID do caminho da requisição
+        const pathParts = new URL(request.url).pathname.split('/');
+        const itemId = pathParts[pathParts.length - 1];
         
-        // Aqui tentaríamos enviar os dados para o servidor
-        const serverResponse = await fetch('/api/diary-entries', {
+        // Recuperar os dados do cache
+        const response = await cache.match(request);
+        if (!response) continue;
+        
+        const data = await response.json();
+        console.log(`Sincronizando item ${itemId}:`, data);
+        
+        // Determinar o endpoint da API com base no nome do cache
+        let endpoint = '';
+        switch (cacheName) {
+          case 'diary-entries-sync':
+            endpoint = '/api/diary-entries';
+            break;
+          case 'medical-data-sync':
+            endpoint = '/api/medical-data';
+            break;
+          default:
+            endpoint = `/api/${cacheName}`;
+        }
+        
+        // Enviar para o servidor
+        const serverResponse = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
+          body: JSON.stringify({
+            ...data,
+            _syncId: itemId,
+            _syncTimestamp: new Date().toISOString()
+          })
         });
         
         if (serverResponse.ok) {
           // Se o envio foi bem-sucedido, remova do cache
           await cache.delete(request);
+          successCount++;
+          console.log(`Sincronização bem-sucedida para ${itemId}`);
+        } else {
+          failCount++;
+          console.error(`Falha na sincronização para ${itemId}: ${serverResponse.status}`);
+          
+          // Se for um erro permanente (4xx), podemos querer remover do cache
+          // ou marcar como erro para evitar tentativas infinitas
+          if (serverResponse.status >= 400 && serverResponse.status < 500) {
+            await cache.delete(request);
+          }
         }
       } catch (err) {
-        console.error('Erro ao processar entrada do diário:', err);
+        failCount++;
+        console.error(`Erro ao processar item para sincronização:`, err);
       }
     }
+    
+    console.log(`Sincronização concluída para ${cacheName}: ${successCount} sucessos, ${failCount} falhas`);
+    
+    // Notificar todos os clientes sobre o resultado da sincronização
+    self.clients.matchAll().then(clients => {
+      clients.forEach(client => {
+        client.postMessage({
+          type: 'SYNC_COMPLETED',
+          cache: cacheName,
+          success: successCount,
+          failed: failCount
+        });
+      });
+    });
+    
   } catch (err) {
-    console.error('Erro ao sincronizar entradas do diário:', err);
+    console.error(`Erro ao sincronizar ${cacheName}:`, err);
+    throw err; // Rethrow para que o sistema de sincronização possa tentar novamente
   }
 }
 
-async function syncMedicalData() {
-  // Similar ao syncDiaryEntries, mas para dados médicos
-  console.log('Sincronizando dados médicos...');
-}
-
-// Evento de remoção
+// Evento de remoção e atualização do service worker
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();

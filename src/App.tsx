@@ -25,7 +25,23 @@ import Subscription from "./pages/Subscription";
 import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
 
-const queryClient = new QueryClient();
+// Configure o QueryClient para melhor suporte offline
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 3,
+      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
+      staleTime: 5 * 60 * 1000, // 5 minutos
+      cacheTime: 24 * 60 * 60 * 1000, // 24 horas (para suporte offline)
+      refetchOnWindowFocus: false, // Melhor UX para PWA
+      refetchOnMount: true
+    },
+    mutations: {
+      retry: 2,
+      retryDelay: 1000
+    }
+  }
+});
 
 const App = () => {
   // Registrar o service worker assim que o app carregar
@@ -61,6 +77,19 @@ const App = () => {
     if ('serviceWorker' in navigator) {
       handleServiceWorkerUpdate();
     }
+    
+    // Registrar ouvintes para mensagens do service worker
+    const handleServiceWorkerMessage = (event: MessageEvent) => {
+      if (event.data && event.data.type === 'CACHE_UPDATED') {
+        console.log('Recursos em cache atualizados:', event.data.url);
+      }
+    };
+    
+    navigator.serviceWorker.addEventListener('message', handleServiceWorkerMessage);
+    
+    return () => {
+      navigator.serviceWorker.removeEventListener('message', handleServiceWorkerMessage);
+    };
   }, []);
 
   return (

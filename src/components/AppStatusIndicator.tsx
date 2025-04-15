@@ -1,140 +1,102 @@
 
-import { useEffect, useState } from 'react';
-import { useNetworkStatus } from '@/hooks/useNetworkStatus';
-import { Wifi, WifiOff, RefreshCw, Download } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { usePWA } from '@/hooks/usePWA';
-
-type ServiceWorkerStatus = 'installing' | 'waiting' | 'active' | 'redundant' | 'none';
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
+import { usePWA } from "@/hooks/usePWA";
+import { useEffect, useState } from "react";
+import { ArrowUpCircle, CloudDown, CloudOff, WifiOff, Wifi } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import SyncStatusIndicator from "./SyncStatusIndicator";
 
 const AppStatusIndicator = () => {
   const { isOnline } = useNetworkStatus();
-  const { isInstalled, isInstallable, promptInstall } = usePWA();
-  const [swStatus, setSwStatus] = useState<ServiceWorkerStatus>('none');
-  const [isUpdateAvailable, setIsUpdateAvailable] = useState(false);
+  const { checkForUpdates, applyUpdate } = usePWA();
+  const [hasUpdate, setHasUpdate] = useState(false);
+  const [checkingUpdate, setCheckingUpdate] = useState(false);
 
+  // Verificar atualizações periodicamente
   useEffect(() => {
-    // Verifica o status do service worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.ready.then(registration => {
-        if (registration.active) {
-          setSwStatus('active');
-        }
-        
-        // Verifica se há uma atualização esperando
-        if (registration.waiting) {
-          setIsUpdateAvailable(true);
-          setSwStatus('waiting');
-        }
-        
-        // Configura um listener para atualizações futuras
-        registration.addEventListener('updatefound', () => {
-          const newWorker = registration.installing;
-          if (newWorker) {
-            setSwStatus('installing');
-            
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                setIsUpdateAvailable(true);
-                setSwStatus('waiting');
-              }
-            });
-          }
-        });
-      });
+    const checkUpdates = async () => {
+      if (!isOnline) return;
       
-      // Configura um evento para ouvir atualizações do service worker
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        setIsUpdateAvailable(false);
-        setSwStatus('active');
-      });
-    }
-  }, []);
-  
-  // Atualiza a aplicação
-  const updateApp = () => {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.ready.then(registration => {
-        if (registration.waiting) {
-          registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-        }
-      });
-    }
+      try {
+        setCheckingUpdate(true);
+        const updateAvailable = await checkForUpdates();
+        setHasUpdate(updateAvailable);
+      } catch (error) {
+        console.error('Erro ao verificar atualizações:', error);
+      } finally {
+        setCheckingUpdate(false);
+      }
+    };
+
+    // Verificar inicialmente
+    checkUpdates();
+
+    // Verificar a cada 30 minutos
+    const interval = setInterval(checkUpdates, 30 * 60 * 1000);
+    
+    return () => clearInterval(interval);
+  }, [isOnline, checkForUpdates]);
+
+  // Aplicar atualização quando disponível
+  const handleUpdateClick = () => {
+    applyUpdate();
+    // Recarrega a página após aplicar a atualização
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
   };
-  
-  // Se não estiver em um ambiente PWA ou não tiver service worker, não mostra nada
-  if (!isInstalled && !isInstallable && swStatus === 'none') {
-    return null;
-  }
 
   return (
-    <div className="fixed bottom-3 right-3 z-40">
-      <TooltipProvider delayDuration={300}>
-        <div className="flex flex-col gap-2">
-          {/* Indicador de status online/offline */}
+    <>
+      {/* Indicador de Conexão */}
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div 
+              className={`fixed bottom-4 right-4 z-50 rounded-full p-2 shadow-md ${
+                isOnline ? 'bg-green-100 dark:bg-green-900' : 'bg-red-100 dark:bg-red-900'
+              }`}
+            >
+              {isOnline ? (
+                <Wifi className="h-4 w-4 text-green-500" />
+              ) : (
+                <WifiOff className="h-4 w-4 text-red-500" />
+              )}
+            </div>
+          </TooltipTrigger>
+          <TooltipContent side="left">
+            {isOnline 
+              ? "Você está conectado à internet" 
+              : "Você está offline. Algumas funcionalidades podem estar limitadas."}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
+      {/* Indicador de Atualização */}
+      {hasUpdate && (
+        <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className={`h-8 w-8 rounded-full flex items-center justify-center ${
-                isOnline ? 'bg-green-100 dark:bg-green-900/30' : 'bg-red-100 dark:bg-red-900/30'
-              }`}>
-                {isOnline ? (
-                  <Wifi size={14} className="text-green-600 dark:text-green-400" />
-                ) : (
-                  <WifiOff size={14} className="text-red-600 dark:text-red-400" />
-                )}
-              </div>
+              <Button
+                size="icon"
+                variant="outline"
+                className="fixed bottom-4 right-14 z-50 h-8 w-8 rounded-full p-0 shadow-md bg-blue-100 dark:bg-blue-900"
+                onClick={handleUpdateClick}
+              >
+                <ArrowUpCircle className="h-4 w-4 text-blue-500" />
+              </Button>
             </TooltipTrigger>
             <TooltipContent side="left">
-              <p>{isOnline ? 'Online' : 'Offline'}</p>
+              Nova versão disponível. Clique para atualizar.
             </TooltipContent>
           </Tooltip>
-          
-          {/* Botão de atualização disponível */}
-          {isUpdateAvailable && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  size="icon"
-                  variant="outline"
-                  className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 animate-pulse"
-                  onClick={updateApp}
-                >
-                  <RefreshCw size={14} className="text-blue-600 dark:text-blue-400" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="left">
-                <p>Nova versão disponível. Clique para atualizar.</p>
-              </TooltipContent>
-            </Tooltip>
-          )}
-          
-          {/* Botão de instalação do PWA */}
-          {!isInstalled && isInstallable && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  size="icon"
-                  variant="outline"
-                  className="h-8 w-8 rounded-full bg-purple-100 dark:bg-purple-900/30"
-                  onClick={() => promptInstall()}
-                >
-                  <Download size={14} className="text-purple-600 dark:text-purple-400" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="left">
-                <p>Instalar aplicativo</p>
-              </TooltipContent>
-            </Tooltip>
-          )}
-        </div>
-      </TooltipProvider>
-    </div>
+        </TooltipProvider>
+      )}
+
+      {/* Indicador de Sincronização */}
+      <SyncStatusIndicator />
+    </>
   );
 };
 
