@@ -7,12 +7,13 @@
     <title>MiniPassos - Acompanhamento do Desenvolvimento Infantil</title>
     <meta name="description" content="Acompanhe o desenvolvimento do seu bebê de forma simples e intuitiva com o MiniPassos." />
     <meta name="author" content="MiniPassos" />
-    <meta name="theme-color" content="#a78bfa" />
+    <meta name="theme-color" content="#8b5cf6" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="MiniPassos" />
     <meta name="application-name" content="MiniPassos" />
-    <meta name="msapplication-TileColor" content="#a78bfa" />
+    <meta name="msapplication-TileColor" content="#8b5cf6" />
+    <meta name="msapplication-navbutton-color" content="#8b5cf6" />
 
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" href="/favicon.ico" />
@@ -20,21 +21,51 @@
     <link rel="apple-touch-icon" sizes="152x152" href="/logo192.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/logo192.png" />
     <link rel="apple-touch-icon" sizes="167x167" href="/logo192.png" />
+    
+    <!-- Adiciona splash screens para iOS -->
+    <link href="/splashscreens/iphone5_splash.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+    <link href="/splashscreens/iphone6_splash.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+    <link href="/splashscreens/iphoneplus_splash.png" media="(device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
+    <link href="/splashscreens/iphonex_splash.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
+    <link href="/splashscreens/iphonexr_splash.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+    <link href="/splashscreens/iphonexsmax_splash.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
+    <link href="/splashscreens/ipad_splash.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+    <link href="/splashscreens/ipadpro1_splash.png" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+    <link href="/splashscreens/ipadpro2_splash.png" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+    <link href="/splashscreens/ipadpro3_splash.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
 
     <meta property="og:title" content="MiniPassos - Acompanhamento do Desenvolvimento Infantil" />
     <meta property="og:description" content="Acompanhe o desenvolvimento do seu bebê de forma simples e intuitiva com o MiniPassos." />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta property="og:site_name" content="MiniPassos" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@minipassos" />
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta name="twitter:title" content="MiniPassos - Acompanhamento Infantil" />
+    <meta name="twitter:description" content="Acompanhe o desenvolvimento do seu bebê de forma simples e intuitiva." />
+
+    <!-- Preconecta com domínios importantes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://virxaldfernftbborgow.supabase.co" crossorigin />
+    
+    <!-- Precarrega recursos críticos -->
+    <link rel="preload" as="image" href="/logo192.png" />
+    <link rel="preload" as="style" href="/src/index.css" />
   </head>
 
   <body>
     <div id="root"></div>
-    <noscript>Você precisa habilitar JavaScript para executar este aplicativo.</noscript>
+    <noscript>
+      <div style="padding: 2rem; text-align: center; font-family: sans-serif;">
+        <h1>JavaScript é necessário</h1>
+        <p>Você precisa habilitar JavaScript para executar este aplicativo.</p>
+      </div>
+    </noscript>
     <script>
+      // Verifica se serviceworker é suportado
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {
           navigator.serviceWorker.register('/service-worker.js')
@@ -49,6 +80,5 @@
     </script>
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
-    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

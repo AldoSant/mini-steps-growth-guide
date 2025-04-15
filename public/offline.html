@@ -3,9 +3,17 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>MiniPassos - Sem conexão</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#8b5cf6">
   <style>
+    :root {
+      --purple-primary: #8b5cf6;
+      --purple-light: #a78bfa;
+      --purple-dark: #7c3aed;
+    }
+    
     body {
       font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       margin: 0;
@@ -35,6 +43,13 @@
       align-items: center;
       justify-content: center;
       margin: 0 auto 2rem;
+      animation: pulse 2s infinite ease-in-out;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.8; }
+      100% { transform: scale(1); opacity: 1; }
     }
     
     .logo svg {
@@ -67,11 +82,111 @@
       text-decoration: none;
       display: inline-block;
       transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
     }
     
     .button:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    }
+    
+    .button::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 5px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.5);
+      opacity: 0;
+      border-radius: 100%;
+      transform: scale(1, 1) translate(-50%);
+      transform-origin: 50% 50%;
+    }
+    
+    .button:focus:not(:active)::after {
+      animation: ripple 1s ease-out;
+    }
+    
+    @keyframes ripple {
+      0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+      }
+      20% {
+        transform: scale(25, 25);
+        opacity: 0.3;
+      }
+      100% {
+        opacity: 0;
+        transform: scale(40, 40);
+      }
+    }
+    
+    .cached-content {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(0,0,0,0.1);
+    }
+    
+    .cached-content-title {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      color: #333;
+    }
+    
+    .cached-links {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.75rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    
+    .cached-link {
+      background: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 0.75rem;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      color: #333;
+    }
+    
+    .cached-link:hover {
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transform: translateY(-2px);
+    }
+    
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #1a1a2e;
+        color: #e1e1e1;
+      }
+      
+      h1 {
+        color: #f0f0f0;
+      }
+      
+      p {
+        color: #b8b8b8; 
+      }
+      
+      .cached-content-title {
+        color: #e1e1e1;
+      }
+      
+      .cached-link {
+        background: #252538;
+        color: #e1e1e1;
+      }
+      
+      .cached-content {
+        border-top-color: rgba(255,255,255,0.1);
+      }
     }
   </style>
 </head>
@@ -89,6 +204,49 @@
     <h1>Sem conexão</h1>
     <p>Parece que você está offline no momento. Algumas funcionalidades do MiniPassos não estão disponíveis sem conexão à internet.</p>
     <button class="button" onClick="window.location.reload()">Tentar novamente</button>
+    
+    <div class="cached-content">
+      <h2 class="cached-content-title">Conteúdo disponível offline</h2>
+      <ul class="cached-links" id="offline-links">
+        <!-- Links serão injetados via JavaScript -->
+      </ul>
+    </div>
   </div>
+
+  <script>
+    // Adiciona links para conteúdo disponível offline
+    const offlinePages = [
+      { title: 'Dashboard', url: '/dashboard', isAvailable: true },
+      { title: 'Perfil do Bebê', url: '/perfil', isAvailable: true },
+      { title: 'Biblioteca', url: '/biblioteca', isAvailable: true }
+    ];
+    
+    const linksContainer = document.getElementById('offline-links');
+    
+    offlinePages.forEach(page => {
+      if (page.isAvailable) {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = page.url;
+        a.className = 'cached-link';
+        a.textContent = page.title;
+        li.appendChild(a);
+        linksContainer.appendChild(li);
+      }
+    });
+    
+    // Tenta carregar registros salvos offline
+    if ('serviceWorker' in navigator && 'caches' in window) {
+      caches.open('minipassos-cache-v4').then(cache => {
+        cache.keys().then(keys => {
+          if (keys.length === 0) {
+            const noContent = document.createElement('p');
+            noContent.textContent = 'Nenhum conteúdo disponível offline.';
+            document.querySelector('.cached-content').appendChild(noContent);
+          }
+        });
+      });
+    }
+  </script>
 </body>
 </html>

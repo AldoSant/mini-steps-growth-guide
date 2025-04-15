@@ -25,10 +25,10 @@
       "purpose": "maskable"
     }
   ],
-  "start_url": "/dashboard",
   "id": "/",
+  "start_url": "/dashboard",
   "display": "standalone",
-  "theme_color": "#a78bfa",
+  "theme_color": "#8b5cf6",
   "background_color": "#ffffff",
   "orientation": "portrait",
   "description": "Acompanhe o desenvolvimento do seu bebê com o MiniPassos",
@@ -41,12 +41,26 @@
     {
       "src": "screenshot1.png",
       "sizes": "1280x720",
-      "type": "image/png"
+      "type": "image/png",
+      "form_factor": "wide"
     },
     {
       "src": "screenshot2.png",
       "sizes": "1280x720",
-      "type": "image/png"
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "screenshot_mobile1.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "screenshot_mobile2.png",
+      "sizes": "750x1334", 
+      "type": "image/png",
+      "form_factor": "narrow"
     }
   ],
   "shortcuts": [
@@ -70,6 +84,21 @@
       "description": "Atividades recomendadas",
       "url": "/atividades",
       "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Biblioteca",
+      "short_name": "Biblioteca",
+      "description": "Conteúdo educativo",
+      "url": "/biblioteca",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
     }
-  ]
+  ],
+  "related_applications": [],
+  "edge_side_panel": {
+    "preferred_width": 480
+  },
+  "handle_links": "preferred",
+  "launch_handler": {
+    "client_mode": ["navigate-existing", "auto"]
+  }
 }
