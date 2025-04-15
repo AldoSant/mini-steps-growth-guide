@@ -1,9 +1,8 @@
-
 import { useEffect, useState } from "react";
 import { Download, X, Info, CheckCircle, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePWA } from "@/hooks/usePWA";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
@@ -19,7 +18,6 @@ const PWAInstallBanner = () => {
   const { toast } = useToast();
   const [installAttempted, setInstallAttempted] = useState(false);
 
-  // Verifica se precisa mostrar o banner
   useEffect(() => {
     if (isInstallable && !isInstalled) {
       const hasSeenBanner = localStorage.getItem('pwa_banner_dismissed');
@@ -27,11 +25,7 @@ const PWAInstallBanner = () => {
       const now = Date.now();
       const threeDays = 3 * 24 * 60 * 60 * 1000; // 3 dias em milissegundos
       
-      // Mostrar o banner se:
-      // 1. Nunca foi dispensado OU
-      // 2. Foi dispensado mas já se passaram 3 dias desde o último prompt
       if (!hasSeenBanner || (now - lastPrompt > threeDays)) {
-        // Espere um pouco para não interromper a experiência inicial do usuário
         const timer = setTimeout(() => {
           setShowBanner(true);
           localStorage.setItem('pwa_last_prompt', now.toString());
@@ -47,15 +41,18 @@ const PWAInstallBanner = () => {
       await promptInstall();
       toast({
         title: "Instalação iniciada",
-        description: "Siga as instruções na tela para completar a instalação",
-        icon: <CheckCircle className="h-4 w-4 text-green-500" />
+        description: (
+          <div className="flex items-center">
+            <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+            <span>Siga as instruções na tela para completar a instalação</span>
+          </div>
+        )
       });
       setShowBanner(false);
       localStorage.setItem('pwa_banner_dismissed', 'true');
     } catch (error: any) {
       console.error("Error installing PWA:", error);
       
-      // Se for erro específico do iOS ou prompt não disponível
       if (error.message === 'ios_instructions' || error.message === 'no_prompt_available') {
         setShowDialog(true);
       } else if (error.message === 'user_dismissed') {
@@ -81,10 +78,8 @@ const PWAInstallBanner = () => {
     setShowBanner(false);
   };
 
-  // Manuseio das instruções de instalação manual
   const instructions = getInstallInstructions();
 
-  // Não renderizar nada se o banner não deve ser mostrado
   if (!showBanner) return null;
 
   return (

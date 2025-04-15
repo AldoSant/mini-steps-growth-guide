@@ -19,8 +19,12 @@ export const useNetworkStatus = () => {
       // Mostra um toast quando a conexão é restaurada
       toast({
         title: "Conexão restaurada",
-        description: "Você está online novamente.",
-        icon: <Wifi className="h-4 w-4 text-green-500" />,
+        description: (
+          <div className="flex items-center">
+            <Wifi className="h-4 w-4 text-green-500 mr-2" />
+            <span>Você está online novamente.</span>
+          </div>
+        ),
         duration: 3000,
       });
     };
@@ -33,8 +37,12 @@ export const useNetworkStatus = () => {
       toast({
         variant: "destructive",
         title: "Sem conexão",
-        description: "Algumas funcionalidades podem estar limitadas.",
-        icon: <WifiOff className="h-4 w-4" />,
+        description: (
+          <div className="flex items-center">
+            <WifiOff className="h-4 w-4 mr-2" />
+            <span>Algumas funcionalidades podem estar limitadas.</span>
+          </div>
+        ),
         duration: 5000,
       });
     };
