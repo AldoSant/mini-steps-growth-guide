@@ -9,25 +9,25 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Article } from "@/types";
+import { Activity } from "@/types";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 const LibraryDetails = () => {
   const { id } = useParams<{ id: string }>();
-  const [article, setArticle] = useState<Article | null>(null);
+  const [activity, setActivity] = useState<Activity | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    const fetchArticle = async () => {
+    const fetchActivity = async () => {
       if (!id) return;
 
       try {
         setIsLoading(true);
         const { data, error } = await supabase
-          .from('articles')
+          .from('activities')
           .select('*')
           .eq('id', id)
           .single();
@@ -36,20 +36,20 @@ const LibraryDetails = () => {
           throw error;
         }
 
-        setArticle(data as Article);
+        setActivity(data as Activity);
       } catch (error) {
-        console.error('Error fetching article:', error);
+        console.error('Error fetching activity:', error);
         toast({
           variant: "destructive",
-          title: "Erro ao carregar artigo",
-          description: "Não foi possível obter os detalhes deste artigo."
+          title: "Erro ao carregar conteúdo",
+          description: "Não foi possível obter os detalhes deste conteúdo."
         });
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchArticle();
+    fetchActivity();
   }, [id, toast]);
 
   const formatDate = (dateString: string) => {
@@ -82,55 +82,43 @@ const LibraryDetails = () => {
               <Skeleton className="h-64 w-full rounded-lg" />
               <Skeleton className="h-32 w-full" />
             </div>
-          ) : !article ? (
+          ) : !activity ? (
             <div className="text-center py-12">
-              <h2 className="text-2xl font-semibold text-gray-700">Artigo não encontrado</h2>
-              <p className="text-gray-500 mt-2">O artigo que você procura não existe ou foi removido.</p>
+              <h2 className="text-2xl font-semibold text-gray-700">Conteúdo não encontrado</h2>
+              <p className="text-gray-500 mt-2">O conteúdo que você procura não existe ou foi removido.</p>
               <Button 
                 className="mt-4 bg-minipassos-purple hover:bg-minipassos-purple-dark"
                 onClick={() => navigate("/biblioteca")}
               >
-                Ver todos os artigos
+                Ver todos os conteúdos
               </Button>
             </div>
           ) : (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-gray-800">{article.title}</h1>
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-800">{activity.title}</h1>
                 <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-600">
-                  {article.author && (
+                  {activity.category && (
                     <div className="flex items-center">
-                      <User className="h-4 w-4 mr-1" />
-                      <span>{article.author}</span>
+                      <Tag className="h-4 w-4 mr-1" />
+                      <span>{activity.category}</span>
                     </div>
                   )}
                   
-                  {article.published_date && (
+                  {activity.created_at && (
                     <div className="flex items-center">
                       <Calendar className="h-4 w-4 mr-1" />
-                      <span>{formatDate(article.published_date)}</span>
+                      <span>{formatDate(activity.created_at)}</span>
                     </div>
                   )}
-                  
-                  <div className="flex flex-wrap gap-2 mt-1">
-                    {article.categories && article.categories.map((category, i) => (
-                      <span 
-                        key={i} 
-                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-minipassos-purple/10 text-minipassos-purple"
-                      >
-                        <Tag className="mr-1 h-3 w-3" />
-                        {category}
-                      </span>
-                    ))}
-                  </div>
                 </div>
               </div>
 
-              {article.image_url && (
+              {activity.image_url && (
                 <div className="relative h-64 md:h-80 w-full overflow-hidden rounded-lg">
                   <img 
-                    src={article.image_url} 
-                    alt={article.title}
+                    src={activity.image_url} 
+                    alt={activity.title}
                     className="absolute inset-0 w-full h-full object-cover" 
                   />
                 </div>
@@ -139,16 +127,28 @@ const LibraryDetails = () => {
               <Card>
                 <CardContent className="pt-6">
                   <div className="prose max-w-none">
-                    {article.content && article.content.split('\n\n').map((paragraph, i) => (
-                      <p key={i} className="mb-4">{paragraph}</p>
-                    ))}
+                    {activity.description && (
+                      <div className="mb-6">
+                        <h2 className="text-xl font-semibold mb-2">Descrição</h2>
+                        <p>{activity.description}</p>
+                      </div>
+                    )}
                     
-                    {article.references && article.references.length > 0 && (
+                    {activity.instructions && (
+                      <div className="mb-6">
+                        <h2 className="text-xl font-semibold mb-2">Instruções</h2>
+                        {activity.instructions.split('\n\n').map((paragraph, i) => (
+                          <p key={i} className="mb-4">{paragraph}</p>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {activity.materials && activity.materials.length > 0 && (
                       <div className="mt-8 pt-4 border-t border-gray-100">
-                        <h2 className="text-lg font-semibold mb-2">Referências</h2>
+                        <h2 className="text-lg font-semibold mb-2">Materiais</h2>
                         <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
-                          {article.references.map((reference, i) => (
-                            <li key={i}>{reference}</li>
+                          {activity.materials.map((material, i) => (
+                            <li key={i}>{material}</li>
                           ))}
                         </ul>
                       </div>
