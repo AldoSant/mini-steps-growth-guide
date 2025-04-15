@@ -1,128 +1,155 @@
 
 import { useState, useEffect } from 'react';
 
-interface BeforeInstallPromptEvent extends Event {
-  readonly platforms: string[];
-  readonly userChoice: Promise<{
-    outcome: 'accepted' | 'dismissed';
-    platform: string;
-  }>;
-  prompt(): Promise<void>;
+type BeforeInstallPromptEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
+};
+
+interface PWAStatus {
+  isInstallable: boolean;
+  isInstalled: boolean;
+  wasDismissed: boolean | null;
 }
 
-declare global {
-  interface WindowEventMap {
-    beforeinstallprompt: BeforeInstallPromptEvent;
-  }
-  
-  // Adicione standalone à interface Navigator
-  interface Navigator {
-    standalone?: boolean;
-  }
-}
+export const usePWA = () => {
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [status, setStatus] = useState<PWAStatus>({
+    isInstallable: false,
+    isInstalled: false,
+    wasDismissed: null
+  });
 
-export function usePWA() {
-  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [isInstalled, setIsInstalled] = useState(false);
-  const [isInstallable, setIsInstallable] = useState(false);
-
+  // Check if app is already installed
   useEffect(() => {
-    // Verifique se o aplicativo já está instalado via display-mode
-    const checkIfInstalled = () => {
-      if (window.matchMedia('(display-mode: standalone)').matches || 
-          (navigator.standalone === true)) {
-        setIsInstalled(true);
-        console.log('PWA já está instalado (display-mode: standalone)');
-        return true;
-      }
-      return false;
+    const checkInstalled = () => {
+      // Check if display-mode is standalone or PWA criteria
+      const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || 
+                                 (window.navigator as any).standalone || 
+                                 document.referrer.includes('android-app://');
+      
+      setStatus(prev => ({
+        ...prev,
+        isInstalled: isInStandaloneMode
+      }));
     };
 
-    const isCurrentlyInstalled = checkIfInstalled();
+    checkInstalled();
+    window.addEventListener('appinstalled', checkInstalled);
     
-    if (!isCurrentlyInstalled) {
-      console.log('PWA não está instalado, escutando beforeinstallprompt');
-      
-      // Ouça o evento beforeinstallprompt
-      const handleBeforeInstallPrompt = (e: BeforeInstallPromptEvent) => {
-        // Impedir que o Chrome 67 e anteriores mostrem automaticamente o prompt
-        e.preventDefault();
-        // Armazene o evento para que possa ser acionado mais tarde
-        setInstallPrompt(e);
-        setIsInstallable(true);
-        console.log('PWA é instalável, beforeinstallprompt disparado');
-      };
-
-      // Para depuração - apenas no desenvolvimento
-      window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt as EventListener);
-
-      // Escute as alterações no display-mode
-      const mediaQueryList = window.matchMedia('(display-mode: standalone)');
-      const handleDisplayModeChange = (e: MediaQueryListEvent) => {
-        setIsInstalled(e.matches);
-        console.log('Modo de exibição alterado:', e.matches ? 'standalone' : 'browser');
-      };
-      
-      if (mediaQueryList.addEventListener) {
-        mediaQueryList.addEventListener('change', handleDisplayModeChange);
-      }
-
-      // Escute a instalação do aplicativo
-      window.addEventListener('appinstalled', () => {
-        setIsInstalled(true);
-        setIsInstallable(false);
-        setInstallPrompt(null);
-        console.log('MiniPassos foi instalado com sucesso!');
-      });
-      
-      // Forçar instalável para depuração - útil para testes
-      setTimeout(() => {
-        if (!isInstallable) {
-          console.log("Forçando isInstallable para true (modo de teste)");
-          setIsInstallable(true);
-        }
-      }, 5000);
-
-      return () => {
-        window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt as EventListener);
-        if (mediaQueryList.removeEventListener) {
-          mediaQueryList.removeEventListener('change', handleDisplayModeChange);
-        }
-      };
-    }
+    return () => {
+      window.removeEventListener('appinstalled', checkInstalled);
+    };
   }, []);
 
+  // Capture the beforeinstallprompt event
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Store the event so it can be triggered later
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
+      // Update status
+      setStatus(prev => ({
+        ...prev,
+        isInstallable: true
+      }));
+      
+      console.info('PWA não está instalado, escutando beforeinstallprompt');
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    
+    // For debugging
+    if (process.env.NODE_ENV === 'development') {
+      setTimeout(() => {
+        console.info('Status do PWA:', status);
+      }, 2000);
+    }
+    
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, [status]);
+  
+  // Function to prompt user to install PWA
   const promptInstall = async () => {
-    if (!installPrompt) {
-      console.log('Instalação não disponível - installPrompt é null');
-      // Simular instalação para depuração
-      console.log('Simulando instalação para teste!');
+    if (!deferredPrompt) {
+      console.warn('Prompt de instalação não disponível');
       
-      // Mostrar uma mensagem que instrui o usuário
-      alert("Para instalar o MiniPassos: \n1. No iOS: toque no botão compartilhar e selecione 'Adicionar à tela inicial'\n2. No Android: toque no menu do navegador (3 pontos) e selecione 'Instalar aplicativo'");
+      // On iOS, just show instructions as we can't automatically prompt
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+      if (isIOS) {
+        return Promise.reject(new Error('ios_instructions'));
+      }
       
-      return;
+      return Promise.reject(new Error('no_prompt_available'));
     }
 
-    // Mostre o prompt de instalação
-    await installPrompt.prompt();
+    // Show the install prompt
+    deferredPrompt.prompt();
 
-    // Espere pelo usuário responder ao prompt
-    const choiceResult = await installPrompt.userChoice;
+    // Wait for the user to respond to the prompt
+    const choiceResult = await deferredPrompt.userChoice;
+    
+    // Update status based on user choice
+    setStatus(prev => ({
+      ...prev,
+      wasDismissed: choiceResult.outcome === 'dismissed'
+    }));
+
+    // Clear the deferredPrompt as it can only be used once
+    setDeferredPrompt(null);
     
     if (choiceResult.outcome === 'accepted') {
-      console.log('Usuário aceitou a instalação');
+      console.info('Usuário aceitou a instalação do PWA');
+      return Promise.resolve();
     } else {
-      console.log('Usuário rejeitou a instalação');
+      console.info('Usuário recusou a instalação do PWA');
+      return Promise.reject(new Error('user_dismissed'));
     }
-
-    // Redefina o installPrompt para null
-    setInstallPrompt(null);
   };
 
-  return { 
-    isInstallable, 
-    isInstalled, 
-    promptInstall 
+  // Get PWA installation instructions for different platforms
+  const getInstallInstructions = () => {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    const isAndroid = /Android/.test(navigator.userAgent);
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    
+    if (isIOS && isSafari) {
+      return {
+        platform: 'iOS',
+        steps: [
+          'Toque no ícone de compartilhamento',
+          'Role para baixo e toque em "Adicionar à Tela Inicial"',
+          'Confirme tocando em "Adicionar"'
+        ]
+      };
+    } else if (isAndroid && /chrome/i.test(navigator.userAgent)) {
+      return {
+        platform: 'Android',
+        steps: [
+          'Toque no menu (três pontos)',
+          'Toque em "Adicionar à Tela Inicial"',
+          'Confirme a instalação'
+        ]
+      };
+    } else {
+      return {
+        platform: 'Desktop',
+        steps: [
+          'Clique no ícone de instalação na barra de endereço',
+          'Clique em "Instalar"'
+        ]
+      };
+    }
   };
-}
+  
+  return {
+    isInstallable: status.isInstallable,
+    isInstalled: status.isInstalled,
+    wasDismissed: status.wasDismissed,
+    promptInstall,
+    getInstallInstructions
+  };
+};

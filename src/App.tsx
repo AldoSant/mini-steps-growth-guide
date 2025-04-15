@@ -9,12 +9,15 @@ import { BabyProvider } from "./context/BabyContext";
 import { MilestoneProvider } from "./context/MilestoneContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PWAInstallBanner from "./components/PWAInstallBanner";
+import FloatingMenu from "./components/FloatingMenu";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import BabyDiary from "./pages/BabyDiary";
 import Activities from "./pages/Activities";
+import ActivityDetails from "./pages/ActivityDetails";
 import Library from "./pages/Library";
+import LibraryDetails from "./pages/LibraryDetails";
 import BabyProfile from "./pages/BabyProfile";
 import MedicalHistory from "./pages/MedicalHistory";
 import Subscription from "./pages/Subscription";
@@ -41,7 +44,9 @@ const App = () => (
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/diario" element={<BabyDiary />} />
                   <Route path="/atividades" element={<Activities />} />
+                  <Route path="/atividades/:id" element={<ActivityDetails />} />
                   <Route path="/biblioteca" element={<Library />} />
+                  <Route path="/biblioteca/:id" element={<LibraryDetails />} />
                   <Route path="/perfil" element={<BabyProfile />} />
                   <Route path="/historico-medico" element={<MedicalHistory />} />
                 </Route>
@@ -49,6 +54,7 @@ const App = () => (
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              <FloatingMenu />
               <PWAInstallBanner />
             </BrowserRouter>
           </TooltipProvider>

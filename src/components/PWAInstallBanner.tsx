@@ -1,107 +1,88 @@
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Download, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { usePWA } from '@/hooks/usePWA';
-import { useToast } from '@/hooks/use-toast';
+import { useEffect, useState } from "react";
+import { Download, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { usePWA } from "@/hooks/usePWA";
+import { useToast } from "@/components/ui/use-toast";
 
-export default function PWAInstallBanner() {
-  const { isInstallable, isInstalled, promptInstall } = usePWA();
-  const [dismissed, setDismissed] = useState(false);
+const PWAInstallBanner = () => {
   const [showBanner, setShowBanner] = useState(false);
+  const { isInstallable, promptInstall, isInstalled } = usePWA();
   const { toast } = useToast();
-  
-  // Verifique se o banner foi dispensado anteriormente nesta sessão
+
+  // Show banner if PWA is installable and not already showing a toast
   useEffect(() => {
-    const wasDismissed = localStorage.getItem('pwa-banner-dismissed');
-    
-    if (isInstallable && !isInstalled && !wasDismissed) {
-      console.log("PWA é instalável e não instalado - mostrando banner");
-      // Pequeno atraso para garantir que apareça após o carregamento da página
-      const timer = setTimeout(() => {
-        setShowBanner(true);
-        console.log("Definindo showBanner como true");
-      }, 2000);
-      
-      return () => clearTimeout(timer);
-    } else {
-      console.log("Status do PWA:", { isInstallable, isInstalled, wasDismissed });
+    if (isInstallable && !isInstalled) {
+      const hasSeenBanner = localStorage.getItem('pwa_banner_dismissed');
+      if (!hasSeenBanner) {
+        // Wait a bit before showing the banner to not interrupt initial user experience
+        const timer = setTimeout(() => {
+          setShowBanner(true);
+        }, 3000);
+        return () => clearTimeout(timer);
+      }
     }
   }, [isInstallable, isInstalled]);
-
-  const handleDismiss = () => {
-    setDismissed(true);
-    setShowBanner(false);
-    // Armazene a dispensa no localStorage para evitar mostrar novamente nesta sessão
-    localStorage.setItem('pwa-banner-dismissed', 'true');
-    toast({
-      title: "Notificação ocultada",
-      description: "Você pode instalar o app a qualquer momento nas configurações"
-    });
-  };
 
   const handleInstall = async () => {
     try {
       await promptInstall();
       toast({
         title: "Instalação iniciada",
-        description: "Siga as instruções para instalar o MiniPassos"
+        description: "Siga as instruções na tela para completar a instalação",
       });
+      setShowBanner(false);
     } catch (error) {
-      console.error("Erro na instalação:", error);
+      console.error("Error installing PWA:", error);
       toast({
+        variant: "destructive",
         title: "Erro na instalação",
-        description: "Não foi possível iniciar a instalação",
-        variant: "destructive"
+        description: "Não foi possível iniciar a instalação do aplicativo."
       });
     }
   };
 
-  if (!showBanner || dismissed || !isInstallable || isInstalled) {
-    return null;
-  }
+  const dismissBanner = () => {
+    localStorage.setItem('pwa_banner_dismissed', 'true');
+    setShowBanner(false);
+  };
+
+  // Don't render anything if banner shouldn't be shown
+  if (!showBanner) return null;
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: 50 }}
-        transition={{ duration: 0.3 }}
-        className="fixed bottom-4 inset-x-0 mx-auto w-11/12 max-w-md z-50"
-      >
-        <div className="bg-white p-4 rounded-lg shadow-lg border border-minipassos-purple/20 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="bg-minipassos-purple/10 p-2 rounded-full">
-              <Download size={20} className="text-minipassos-purple" />
+    <div className="fixed bottom-0 inset-x-0 pb-safe z-50">
+      <div className="bg-white border-t border-gray-200 shadow-lg p-4">
+        <div className="container mx-auto flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="bg-gradient-to-r from-minipassos-purple to-minipassos-purple-dark p-3 rounded-full">
+              <Download className="h-6 w-6 text-white" />
             </div>
             <div>
-              <p className="text-sm font-medium">Instalar MiniPassos</p>
-              <p className="text-xs text-gray-500">Acesse diretamente do seu celular</p>
+              <h3 className="font-bold text-gray-800">Instale o MiniPassos</h3>
+              <p className="text-sm text-gray-600">Acesse o app direto da sua tela inicial</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center space-x-2">
             <Button 
-              size="sm" 
-              variant="outline" 
-              className="h-8 w-8 p-0" 
-              onClick={handleDismiss}
-              aria-label="Fechar"
+              variant="ghost" 
+              size="icon" 
+              onClick={dismissBanner}
+              className="rounded-full"
             >
-              <X size={16} />
-              <span className="sr-only">Fechar</span>
+              <X className="h-5 w-5" />
             </Button>
             <Button 
-              size="sm" 
-              className="h-8 bg-minipassos-purple hover:bg-minipassos-purple-dark"
+              className="bg-minipassos-purple hover:bg-minipassos-purple-dark"
               onClick={handleInstall}
             >
               Instalar
             </Button>
           </div>
         </div>
-      </motion.div>
-    </AnimatePresence>
+      </div>
+    </div>
   );
-}
+};
+
+export default PWAInstallBanner;

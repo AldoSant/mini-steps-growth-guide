@@ -137,3 +137,18 @@ export interface SubscriptionPlan {
   isPopular?: boolean;
   color?: string;
 }
+
+export interface Article {
+  id: string;
+  title: string;
+  content: string;
+  author?: string;
+  published_date?: string;
+  image_url?: string;
+  categories?: string[];
+  summary?: string;
+  references?: string[];
+  min_age_months?: number;
+  max_age_months?: number;
+  created_at: string;
+}

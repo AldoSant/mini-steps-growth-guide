@@ -3,9 +3,34 @@ import { ArrowRight, Baby, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { usePWA } from "@/hooks/usePWA";
+import { useToast } from "@/components/ui/use-toast";
 
 const HeroSection = () => {
-  const { isInstallable, promptInstall } = usePWA();
+  const { isInstallable, promptInstall, getInstallInstructions } = usePWA();
+  const { toast } = useToast();
+
+  const handleInstall = async () => {
+    try {
+      await promptInstall();
+    } catch (error) {
+      console.error('Install error:', error);
+      // Show instructions based on platform for iOS or if install prompt not available
+      if (error.message === 'ios_instructions' || error.message === 'no_prompt_available') {
+        const instructions = getInstallInstructions();
+        toast({
+          title: `Instale o MiniPassos no ${instructions.platform}`,
+          description: (
+            <ol className="list-decimal pl-4 mt-2 space-y-1">
+              {instructions.steps.map((step, i) => (
+                <li key={i}>{step}</li>
+              ))}
+            </ol>
+          ),
+          duration: 10000,
+        });
+      }
+    }
+  };
 
   return (
     <section className="relative overflow-hidden">
@@ -34,7 +59,7 @@ const HeroSection = () => {
               </Button>
               
               {isInstallable && (
-                <Button variant="outline" size="lg" className="w-full sm:w-auto" onClick={promptInstall}>
+                <Button variant="outline" size="lg" className="w-full sm:w-auto" onClick={handleInstall}>
                   <Download className="mr-2 h-4 w-4" />
                   Instalar App
                 </Button>
@@ -54,8 +79,8 @@ const HeroSection = () => {
           </div>
 
           <div className="aspect-square max-w-xs mx-auto md:max-w-none rounded-full bg-gradient-to-br from-minipassos-purple-light via-white to-minipassos-blue-light p-6 sm:p-8 flex items-center justify-center">
-            <div className="bg-white rounded-full p-4 sm:p-6 shadow-xl">
-              <div className="bg-gradient-to-r from-minipassos-purple to-minipassos-purple-dark p-8 sm:p-10 rounded-full">
+            <div className="bg-white rounded-full p-4 sm:p-6 shadow-xl animate-pulse">
+              <div className="bg-gradient-to-r from-minipassos-purple to-minipassos-purple-dark p-8 sm:p-10 rounded-full pwa-logo">
                 <Baby size={100} className="text-white" />
               </div>
             </div>

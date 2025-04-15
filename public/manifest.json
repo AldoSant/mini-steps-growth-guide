@@ -1,7 +1,7 @@
 
 {
   "short_name": "MiniPassos",
-  "name": "MiniPassos - Acompanhamento do Desenvolvimento Infantil",
+  "name": "MiniPassos - Acompanhamento Infantil",
   "icons": [
     {
       "src": "favicon.ico",
@@ -25,7 +25,7 @@
       "purpose": "maskable"
     }
   ],
-  "start_url": "/",
+  "start_url": "/dashboard",
   "id": "/",
   "display": "standalone",
   "theme_color": "#a78bfa",
@@ -47,6 +47,29 @@
       "src": "screenshot2.png",
       "sizes": "1280x720",
       "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Visão geral do desenvolvimento",
+      "url": "/dashboard",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Diário do Bebê",
+      "short_name": "Diário",
+      "description": "Registre momentos especiais",
+      "url": "/diario",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Atividades",
+      "short_name": "Atividades",
+      "description": "Atividades recomendadas",
+      "url": "/atividades",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
     }
   ]
 }
