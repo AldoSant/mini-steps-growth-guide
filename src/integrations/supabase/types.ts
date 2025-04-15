@@ -13,6 +13,7 @@ export type Database = {
         Row: {
           category: string
           created_at: string
+          creator_id: string | null
           description: string
           id: string
           image_url: string | null
@@ -20,12 +21,14 @@ export type Database = {
           materials: string[] | null
           max_age_months: number
           min_age_months: number
+          published: boolean | null
           title: string
           video_url: string | null
         }
         Insert: {
           category: string
           created_at?: string
+          creator_id?: string | null
           description: string
           id?: string
           image_url?: string | null
@@ -33,12 +36,14 @@ export type Database = {
           materials?: string[] | null
           max_age_months: number
           min_age_months: number
+          published?: boolean | null
           title: string
           video_url?: string | null
         }
         Update: {
           category?: string
           created_at?: string
+          creator_id?: string | null
           description?: string
           id?: string
           image_url?: string | null
@@ -46,10 +51,78 @@ export type Database = {
           materials?: string[] | null
           max_age_months?: number
           min_age_months?: number
+          published?: boolean | null
           title?: string
           video_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "activities_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      articles: {
+        Row: {
+          author_id: string | null
+          categories: string[] | null
+          content: string
+          created_at: string | null
+          id: string
+          image_url: string | null
+          max_age_months: number | null
+          min_age_months: number | null
+          published: boolean | null
+          published_date: string | null
+          reference_links: string[] | null
+          summary: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          author_id?: string | null
+          categories?: string[] | null
+          content: string
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          max_age_months?: number | null
+          min_age_months?: number | null
+          published?: boolean | null
+          published_date?: string | null
+          reference_links?: string[] | null
+          summary?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          author_id?: string | null
+          categories?: string[] | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          max_age_months?: number | null
+          min_age_months?: number | null
+          published?: boolean | null
+          published_date?: string | null
+          reference_links?: string[] | null
+          summary?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "articles_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       babies: {
         Row: {
@@ -403,27 +476,42 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          content_count: number | null
           created_at: string
           full_name: string | null
           id: string
+          is_verified: boolean | null
+          professional_bio: string | null
+          professional_specialization: string | null
+          professional_title: string | null
           updated_at: string
-          user_role: string
+          user_role: Database["public"]["Enums"]["user_role"]
         }
         Insert: {
           avatar_url?: string | null
+          content_count?: number | null
           created_at?: string
           full_name?: string | null
           id: string
+          is_verified?: boolean | null
+          professional_bio?: string | null
+          professional_specialization?: string | null
+          professional_title?: string | null
           updated_at?: string
-          user_role?: string
+          user_role?: Database["public"]["Enums"]["user_role"]
         }
         Update: {
           avatar_url?: string | null
+          content_count?: number | null
           created_at?: string
           full_name?: string | null
           id?: string
+          is_verified?: boolean | null
+          professional_bio?: string | null
+          professional_specialization?: string | null
+          professional_title?: string | null
           updated_at?: string
-          user_role?: string
+          user_role?: Database["public"]["Enums"]["user_role"]
         }
         Relationships: []
       }
@@ -476,10 +564,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: { _role: Database["public"]["Enums"]["user_role"] }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      user_role: "parent" | "professional" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -594,6 +685,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_role: ["parent", "professional", "admin"],
+    },
   },
 } as const
