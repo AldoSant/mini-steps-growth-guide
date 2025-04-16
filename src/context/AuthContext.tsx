@@ -109,8 +109,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
-  // Update user profile
-  const updateProfile = async (data: any) => {
+  // Update user profile - fixed return type
+  const updateProfile = async (data: any): Promise<void> => {
     if (!user) return;
     
     try {
@@ -123,11 +123,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       // Refetch profile to get latest data
       await fetchUserProfile(user.id);
-      
-      return { success: true };
     } catch (error) {
       console.error("Error updating profile:", error);
-      return { success: false, error };
     }
   };
 

@@ -1,3 +1,4 @@
+
 export interface Baby {
   id: string;
   user_id: string;
@@ -38,6 +39,8 @@ export interface Activity {
   created_at?: string;
   saved?: boolean;
   completed?: boolean;
+  published?: boolean;
+  creator_id?: string;
 }
 
 export interface Milestone {
@@ -151,4 +154,6 @@ export interface Article {
   min_age_months?: number;
   max_age_months?: number;
   created_at: string;
+  published?: boolean;
+  author_id?: string;
 }
