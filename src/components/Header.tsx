@@ -1,4 +1,3 @@
-
 import { useRef, useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -14,7 +13,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Menu, X, LogOut, User, Baby, Settings, Book, Activity, Heart, PlusCircle } from "lucide-react";
 import { useMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
-import logo from "/assets/logo.svg";
+import logo from "../assets/logo.svg";
 
 const Header = () => {
   const navigate = useNavigate();
