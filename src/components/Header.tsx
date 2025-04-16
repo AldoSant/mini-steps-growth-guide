@@ -13,7 +13,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Menu, X, LogOut, User, Baby, Settings, Book, Activity, Heart, PlusCircle } from "lucide-react";
 import { useMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
-import logo from "../assets/logo.svg";
+import logo from "/lovable-uploads/1398730b-6293-4d71-829d-6ddf0be2b6a9.png";
 
 const Header = () => {
   const navigate = useNavigate();
