@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -37,7 +36,6 @@ const BabyDiary = () => {
   
   useEffect(() => {
     if (!currentBaby) {
-      // Se não houver um bebê selecionado, redirecionar para o dashboard
       navigate('/dashboard');
       return;
     }
@@ -59,7 +57,6 @@ const BabyDiary = () => {
         
       if (error) throw error;
       
-      // Converter os dados do banco para o formato usado no componente
       const formattedEntries: DiaryEntry[] = data.map(entry => ({
         ...entry,
         type: entry.image_url && entry.image_url.length > 0 ? "photo" : 
@@ -87,7 +84,6 @@ const BabyDiary = () => {
       
       let imageUrl: string[] = [];
       
-      // Se for uma entrada com foto, fazer upload da imagem
       if (newEntry.type === "photo" && selectedFile) {
         const fileExt = selectedFile.name.split('.').pop();
         const fileName = `${Math.random()}.${fileExt}`;
@@ -112,7 +108,7 @@ const BabyDiary = () => {
         content: newEntry.content,
         entry_date: newEntry.entry_date,
         image_url: newEntry.type === "photo" ? imageUrl : [],
-        video_url: [] // Implementação futura para vídeos
+        video_url: []
       };
       
       const { data, error } = await supabase
@@ -123,7 +119,6 @@ const BabyDiary = () => {
         
       if (error) throw error;
       
-      // Adicionar a nova entrada à lista
       const newEntryWithType: DiaryEntry = {
         ...data,
         type: imageUrl.length > 0 ? "photo" : "note",
@@ -132,7 +127,6 @@ const BabyDiary = () => {
       
       setEntries([newEntryWithType, ...entries]);
       
-      // Limpar o formulário
       setNewEntry({
         title: "",
         content: "",
@@ -192,7 +186,7 @@ const BabyDiary = () => {
     : entries.filter(entry => entry.type === activeTab);
   
   if (!currentBaby) {
-    return null; // O useEffect irá redirecionar para o dashboard
+    return null;
   }
   
   return (
@@ -260,13 +254,14 @@ const BabyDiary = () => {
                   <div className="grid grid-cols-4 gap-4 items-center">
                     <label htmlFor="milestone" className="text-right text-sm font-medium">Marco</label>
                     <Select 
-                      value={newEntry.milestone} 
-                      onValueChange={(value) => setNewEntry({...newEntry, milestone: value})}
+                      value={newEntry.milestone || "none"} 
+                      onValueChange={(value) => setNewEntry({...newEntry, milestone: value === "none" ? "" : value})}
                     >
                       <SelectTrigger className="col-span-3">
                         <SelectValue placeholder="Selecione um marco (opcional)" />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="none">Nenhum marco</SelectItem>
                         <SelectItem value="Motor">Motor</SelectItem>
                         <SelectItem value="Cognitivo">Cognitivo</SelectItem>
                         <SelectItem value="Social">Social</SelectItem>

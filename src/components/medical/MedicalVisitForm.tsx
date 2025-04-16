@@ -89,7 +89,6 @@ const MedicalVisitForm = ({ visit, onComplete }: MedicalVisitFormProps) => {
       };
       
       if (visit) {
-        // Update existing visit
         await updateMedicalVisit(visit.id, payload);
         
         toast({
@@ -97,7 +96,6 @@ const MedicalVisitForm = ({ visit, onComplete }: MedicalVisitFormProps) => {
           description: "Os detalhes da visita foram atualizados com sucesso",
         });
       } else {
-        // Create new visit
         await createMedicalVisit(payload);
         
         toast({

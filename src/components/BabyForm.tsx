@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -66,7 +65,6 @@ const BabyForm = () => {
         description: `${name} foi adicionado à sua conta.`,
       });
       
-      // Redirecionar para o dashboard
       navigate("/dashboard");
     } catch (error: any) {
       toast({
@@ -128,6 +126,7 @@ const BabyForm = () => {
               onSelect={setBirthDate}
               initialFocus
               disabled={(date) => date > new Date()}
+              className="p-3 pointer-events-auto"
             />
           </PopoverContent>
         </Popover>

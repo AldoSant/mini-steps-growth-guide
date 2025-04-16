@@ -24,7 +24,6 @@ const Activities = () => {
   
   const currentBabyAgeInMonths = currentBaby ? getCurrentAgeInMonths(currentBaby) : 0;
 
-  // Carrega as atividades do Supabase ao montar o componente
   useEffect(() => {
     const fetchActivities = async () => {
       try {
@@ -45,11 +44,9 @@ const Activities = () => {
     fetchActivities();
   }, [setActivities]);
 
-  // Filtra as atividades com base nos critérios
   useEffect(() => {
     let filtered = [...activities];
     
-    // Filtrar por termo de busca
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(activity => 
@@ -58,14 +55,12 @@ const Activities = () => {
       );
     }
     
-    // Filtrar por categoria
     if (selectedCategory) {
       filtered = filtered.filter(activity => 
         activity.category.toLowerCase() === selectedCategory.toLowerCase()
       );
     }
     
-    // Filtrar por idade do bebê atual
     if (currentBaby) {
       filtered = filtered.filter(activity => 
         currentBabyAgeInMonths >= (activity.min_age_months || 0) && 
@@ -76,7 +71,6 @@ const Activities = () => {
     setFilteredActivities(filtered);
   }, [activities, searchTerm, selectedCategory, currentBaby, currentBabyAgeInMonths]);
 
-  // Extrai categorias únicas para o filtro
   const categories = [...new Set(activities.map(activity => activity.category))];
 
   return (
@@ -94,7 +88,6 @@ const Activities = () => {
             <ContentCreationButtons type="activities" />
           </div>
           
-          {/* Filtros */}
           <div className="mb-8 grid gap-4 md:grid-cols-3">
             <div className="md:col-span-2">
               <div className="relative">
@@ -113,7 +106,7 @@ const Activities = () => {
                 <SelectValue placeholder="Filtrar por categoria" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todas as categorias</SelectItem>
+                <SelectItem value="all">Todas as categorias</SelectItem>
                 {categories.map(category => (
                   <SelectItem key={category} value={category}>{category}</SelectItem>
                 ))}
@@ -121,7 +114,6 @@ const Activities = () => {
             </Select>
           </div>
           
-          {/* Lista de atividades */}
           {filteredActivities.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-500 mb-4">Nenhuma atividade encontrada para os filtros selecionados.</p>

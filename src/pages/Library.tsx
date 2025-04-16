@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -27,7 +26,6 @@ const Library = () => {
   
   const currentBabyAgeInMonths = currentBaby ? getCurrentAgeInMonths(currentBaby) : 0;
 
-  // Carrega os artigos do Supabase ao montar o componente
   useEffect(() => {
     const fetchArticles = async () => {
       try {
@@ -48,11 +46,9 @@ const Library = () => {
     fetchArticles();
   }, [setArticles]);
 
-  // Filtra os artigos com base nos critérios
   useEffect(() => {
     let filtered = [...articles];
     
-    // Filtrar por termo de busca
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(article => 
@@ -62,14 +58,12 @@ const Library = () => {
       );
     }
     
-    // Filtrar por categoria
     if (selectedCategory && selectedCategory !== "all") {
       filtered = filtered.filter(article => 
         article.categories && article.categories.includes(selectedCategory)
       );
     }
     
-    // Filtrar por idade do bebê atual
     if (currentBaby) {
       filtered = filtered.filter(article => 
         !article.min_age_months || !article.max_age_months ||
@@ -81,7 +75,6 @@ const Library = () => {
     setFilteredArticles(filtered);
   }, [articles, searchTerm, selectedCategory, currentBaby, currentBabyAgeInMonths]);
 
-  // Extrai categorias únicas para o filtro
   const allCategories = articles.flatMap(article => article.categories || []);
   const categories = [...new Set(allCategories)];
 
@@ -100,7 +93,6 @@ const Library = () => {
             <ContentCreationButtons type="articles" className="mb-2 md:mb-0" />
           </div>
           
-          {/* Filtros */}
           <div className="mb-8 grid gap-4 md:grid-cols-3">
             <div className="md:col-span-2">
               <div className="relative">
@@ -119,7 +111,7 @@ const Library = () => {
                 <SelectValue placeholder="Filtrar por categoria" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todas as categorias</SelectItem>
+                <SelectItem value="all">Todas as categorias</SelectItem>
                 {categories.map(category => (
                   <SelectItem key={category} value={category}>{category}</SelectItem>
                 ))}
@@ -127,7 +119,6 @@ const Library = () => {
             </Select>
           </div>
           
-          {/* Lista de artigos */}
           {filteredArticles.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-500 mb-4">Nenhum artigo encontrado para os filtros selecionados.</p>

@@ -91,7 +91,6 @@ const MedicalAppointmentForm = ({ appointment, onComplete }: MedicalAppointmentF
       };
       
       if (appointment) {
-        // Update existing appointment
         await updateMedicalAppointment(appointment.id, payload);
         
         toast({
@@ -99,7 +98,6 @@ const MedicalAppointmentForm = ({ appointment, onComplete }: MedicalAppointmentF
           description: "O agendamento foi atualizado com sucesso",
         });
       } else {
-        // Create new appointment
         await createMedicalAppointment(payload);
         
         toast({
