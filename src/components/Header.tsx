@@ -13,7 +13,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Menu, X, LogOut, User, Baby, Settings, Book, Activity, Heart, PlusCircle } from "lucide-react";
 import { useMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
-import logo from "/lovable-uploads/1398730b-6293-4d71-829d-6ddf0be2b6a9.png";
+import logo from "/lovable-uploads/235ff4e0-cf21-41a0-8e7a-93b1b649c51e.png";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -44,7 +44,7 @@ const Header = () => {
     <header className="bg-white border-b sticky top-0 z-50">
       <div className="container mx-auto px-4 md:px-6 flex justify-between items-center h-16">
         <Link to="/" className="flex items-center">
-          <img src={logo} alt="MiniPassos" className="h-8" />
+          <img src={logo} alt="Marcos Baby" className="h-8" />
         </Link>
 
         {/* Desktop Navigation */}
@@ -219,7 +219,7 @@ const Header = () => {
         >
           <div className="flex justify-between items-center h-16 px-4 border-b">
             <Link to="/" className="flex items-center">
-              <img src={logo} alt="MiniPassos" className="h-8" />
+              <img src={logo} alt="Marcos Baby" className="h-8" />
             </Link>
             <Button
               variant="ghost"

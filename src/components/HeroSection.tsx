@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { usePWA } from "@/hooks/usePWA";
 import { useToast } from "@/components/ui/use-toast";
+import logo from "/lovable-uploads/235ff4e0-cf21-41a0-8e7a-93b1b649c51e.png";
 
 const HeroSection = () => {
   const { isInstallable, promptInstall, getInstallInstructions } = usePWA();
@@ -18,7 +19,7 @@ const HeroSection = () => {
       if (error.message === 'ios_instructions' || error.message === 'no_prompt_available') {
         const instructions = getInstallInstructions();
         toast({
-          title: `Instale o MiniPassos no ${instructions.platform}`,
+          title: `Instale o Marcos Baby no ${instructions.platform}`,
           description: (
             <ol className="list-decimal pl-4 mt-2 space-y-1">
               {instructions.steps.map((step, i) => (
@@ -47,7 +48,7 @@ const HeroSection = () => {
               Acompanhe cada momento do desenvolvimento do seu bebê
             </h1>
             <p className="text-lg text-gray-600">
-              Cada pequeno passo, uma grande conquista. MiniPassos ajuda os pais a monitorar e estimular o desenvolvimento dos seus filhos de 0 a 6 anos.
+              Cada pequeno passo, uma grande conquista. Marcos Baby ajuda os pais a monitorar e estimular o desenvolvimento dos seus filhos de 0 a 6 anos.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
@@ -79,10 +80,8 @@ const HeroSection = () => {
           </div>
 
           <div className="aspect-square max-w-xs mx-auto md:max-w-none rounded-full bg-gradient-to-br from-minipassos-purple-light via-white to-minipassos-blue-light p-6 sm:p-8 flex items-center justify-center">
-            <div className="bg-white rounded-full p-4 sm:p-6 shadow-xl animate-pulse">
-              <div className="bg-gradient-to-r from-minipassos-purple to-minipassos-purple-dark p-8 sm:p-10 rounded-full pwa-logo">
-                <Baby size={100} className="text-white" />
-              </div>
+            <div className="bg-white rounded-full p-4 sm:p-6 shadow-xl">
+              <img src={logo} alt="Marcos Baby Logo" className="w-full max-w-[200px]" />
             </div>
           </div>
         </div>

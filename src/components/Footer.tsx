@@ -12,7 +12,7 @@ const Footer = () => {
               <div className="bg-gradient-to-r from-minipassos-purple to-minipassos-purple-dark p-2 rounded-xl">
                 <Baby size={20} className="text-white" />
               </div>
-              <span className="text-lg font-bold text-minipassos-purple-dark">MiniPassos</span>
+              <span className="text-lg font-bold text-minipassos-purple-dark">Marcos Baby</span>
             </Link>
             <p className="text-gray-500 text-sm">
               Cada pequeno passo, uma grande conquista.
@@ -27,7 +27,7 @@ const Footer = () => {
               <a href="#" className="text-gray-400 hover:text-minipassos-purple">
                 <Twitter size={18} />
               </a>
-              <a href="mailto:contato@minipassos.com.br" className="text-gray-400 hover:text-minipassos-purple">
+              <a href="mailto:contato@marcosbaby.com.br" className="text-gray-400 hover:text-minipassos-purple">
                 <Mail size={18} />
               </a>
             </div>
@@ -86,7 +86,7 @@ const Footer = () => {
         </div>
         
         <div className="border-t border-gray-100 mt-6 pt-6 text-center text-xs text-gray-500">
-          <p>&copy; {new Date().getFullYear()} MiniPassos. Todos os direitos reservados.</p>
+          <p>&copy; {new Date().getFullYear()} Marcos Baby. Todos os direitos reservados.</p>
         </div>
       </div>
     </footer>

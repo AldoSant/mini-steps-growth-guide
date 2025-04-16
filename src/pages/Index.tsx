@@ -1,4 +1,3 @@
-
 import { ArrowRight, Baby, BookOpen, Calendar, Activity, Image, BarChart, Check, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -26,7 +25,7 @@ const Index = () => {
                 Acompanhe todo o desenvolvimento do seu filho
               </h2>
               <p className="text-gray-600 text-lg">
-                Baseado em recomendações da OMS e especialistas, o MiniPassos oferece uma visão completa do desenvolvimento do seu bebê.
+                Baseado em recomendações da OMS e especialistas, o Marcos Baby oferece uma visão completa do desenvolvimento do seu bebê.
               </p>
             </div>
             
@@ -100,7 +99,7 @@ const Index = () => {
           </div>
         </section>
         
-        {/* Registration Section - Moved up */}
+        {/* Registration Section */}
         <section className="py-20 bg-white">
           <div className="container">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -172,14 +171,14 @@ const Index = () => {
                 O que dizem os pais
               </h2>
               <p className="text-gray-600 text-lg">
-                Famílias de todo o Brasil já confiam no MiniPassos para acompanhar o desenvolvimento dos seus pequenos.
+                Famílias de todo o Brasil já confiam no Marcos Baby para acompanhar o desenvolvimento dos seus pequenos.
               </p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
                 {
-                  text: "O MiniPassos me ajudou a entender melhor as fases do desenvolvimento da minha filha e me ensinou atividades que estimulam cada habilidade.",
+                  text: "O Marcos Baby me ajudou a entender melhor as fases do desenvolvimento da minha filha e me ensinou atividades que estimulam cada habilidade.",
                   name: "Ana Clara",
                   role: "Mãe da Sophia, 8 meses"
                 },
@@ -213,7 +212,7 @@ const Index = () => {
           </div>
         </section>
         
-        {/* Subscription Plans - Moved to the end as requested */}
+        {/* Subscription Plans */}
         <section className="py-20 bg-gray-50">
           <div className="container">
             <div className="max-w-3xl mx-auto text-center mb-16">

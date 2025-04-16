@@ -1,7 +1,7 @@
 
 {
-  "short_name": "MiniPassos",
-  "name": "MiniPassos - Acompanhamento Infantil",
+  "short_name": "Marcos Baby",
+  "name": "Marcos Baby - Acompanhamento Infantil",
   "icons": [
     {
       "src": "favicon.ico",
@@ -31,7 +31,7 @@
   "theme_color": "#8b5cf6",
   "background_color": "#ffffff",
   "orientation": "portrait",
-  "description": "Acompanhe o desenvolvimento do seu bebê com o MiniPassos",
+  "description": "Acompanhe o desenvolvimento do seu bebê com o Marcos Baby",
   "dir": "ltr",
   "lang": "pt-BR",
   "prefer_related_applications": false,
