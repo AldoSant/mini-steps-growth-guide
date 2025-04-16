@@ -1,181 +1,373 @@
 
-import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
+import { useRef, useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { Menu, LogOut, User, FileText, Home, BookOpen, Calendar, Baby, Stethoscope, CreditCard, Library } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { Menu, X, LogOut, User, Baby, Settings, Book, Activity, Heart, PlusCircle } from "lucide-react";
+import { useMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
+import logo from "/assets/logo.svg";
 
 const Header = () => {
-  const { user, signOut } = useAuth();
-  const isMobile = useIsMobile();
-  const location = useLocation();
   const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
+  const { user, userProfile, userRole, signOut } = useAuth();
+  const isMobile = useMobile();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const handleSignOut = async () => {
     await signOut();
     navigate("/");
   };
 
-  const routes = [
-    { name: "Home", path: "/", icon: <Home className="h-5 w-5 mr-2" /> },
-    { name: "Dashboard", path: "/dashboard", icon: <FileText className="h-5 w-5 mr-2" /> },
-    { name: "Diário", path: "/diario", icon: <Calendar className="h-5 w-5 mr-2" /> },
-    { name: "Atividades", path: "/atividades", icon: <BookOpen className="h-5 w-5 mr-2" /> },
-    { name: "Biblioteca", path: "/biblioteca", icon: <Library className="h-5 w-5 mr-2" /> },
-    { name: "Histórico Médico", path: "/historico-medico", icon: <Stethoscope className="h-5 w-5 mr-2" /> },
-    { name: "Perfil", path: "/perfil", icon: <Baby className="h-5 w-5 mr-2" /> },
-    { name: "Assinatura", path: "/assinatura", icon: <CreditCard className="h-5 w-5 mr-2" /> },
-  ];
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
-    <header className="sticky top-0 z-30 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 md:h-16 items-center justify-between">
-        <div className="flex items-center gap-4 md:gap-8">
-          <Link to="/" className="flex items-center gap-2">
-            <img src="/logo.png" alt="MiniPassos" className="h-8" />
-            <span className="text-xl font-bold text-primary hidden sm:inline-block">
-              MiniPassos
-            </span>
-          </Link>
+    <header className="bg-white border-b sticky top-0 z-50">
+      <div className="container mx-auto px-4 md:px-6 flex justify-between items-center h-16">
+        <Link to="/" className="flex items-center">
+          <img src={logo} alt="MiniPassos" className="h-8" />
+        </Link>
 
-          {!isMobile && user && (
-            <nav className="hidden md:flex items-center gap-4 text-sm">
-              {routes.slice(1).map((route) => (
-                <Link
-                  key={route.path}
-                  to={route.path}
-                  className={`flex items-center transition-colors hover:text-primary ${
-                    location.pathname === route.path
-                      ? "text-primary font-medium"
-                      : "text-muted-foreground"
-                  }`}
+        {/* Desktop Navigation */}
+        {!isMobile && (
+          <nav className="hidden md:flex items-center space-x-1">
+            {user ? (
+              <>
+                <Button
+                  variant="ghost"
+                  className="text-gray-700 hover:text-minipassos-purple hover:bg-gray-100"
+                  onClick={() => navigate("/dashboard")}
                 >
-                  {route.name}
-                </Link>
-              ))}
-            </nav>
+                  Dashboard
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="text-gray-700 hover:text-minipassos-purple hover:bg-gray-100"
+                  onClick={() => navigate("/atividades")}
+                >
+                  Atividades
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="text-gray-700 hover:text-minipassos-purple hover:bg-gray-100"
+                  onClick={() => navigate("/biblioteca")}
+                >
+                  Biblioteca
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="text-gray-700 hover:text-minipassos-purple hover:bg-gray-100"
+                  onClick={() => navigate("/historico-medico")}
+                >
+                  Saúde
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="ghost"
+                  className="text-gray-700 hover:text-minipassos-purple hover:bg-gray-100"
+                  onClick={() => navigate("/")}
+                >
+                  Início
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="text-gray-700 hover:text-minipassos-purple hover:bg-gray-100"
+                >
+                  Sobre
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="text-gray-700 hover:text-minipassos-purple hover:bg-gray-100"
+                  onClick={() => navigate("/assinatura")}
+                >
+                  Planos
+                </Button>
+              </>
+            )}
+          </nav>
+        )}
+
+        <div className="flex items-center">
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="relative h-10 w-10 rounded-full"
+                >
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={userProfile?.avatar_url || ""} />
+                    <AvatarFallback className="bg-minipassos-purple text-white">
+                      {userProfile?.full_name?.charAt(0) || user?.email?.charAt(0) || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end">
+                <DropdownMenuItem 
+                  className="flex items-center cursor-pointer"
+                  onClick={() => navigate("/perfil")}
+                >
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Meu Perfil</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  className="flex items-center cursor-pointer"
+                  onClick={() => navigate("/dashboard")}
+                >
+                  <Baby className="mr-2 h-4 w-4" />
+                  <span>Meus Bebês</span>
+                </DropdownMenuItem>
+                
+                {userRole === 'professional' && (
+                  <DropdownMenuItem
+                    className="flex items-center cursor-pointer"
+                    onClick={() => navigate("/criar-conteudo")}
+                  >
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    <span>Criar Conteúdo</span>
+                  </DropdownMenuItem>
+                )}
+                
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="flex items-center cursor-pointer"
+                  onClick={() => navigate("/atividades")}
+                >
+                  <Activity className="mr-2 h-4 w-4" />
+                  <span>Atividades</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="flex items-center cursor-pointer"
+                  onClick={() => navigate("/biblioteca")}
+                >
+                  <Book className="mr-2 h-4 w-4" />
+                  <span>Biblioteca</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="flex items-center cursor-pointer"
+                  onClick={() => navigate("/historico-medico")}
+                >
+                  <Heart className="mr-2 h-4 w-4" />
+                  <span>Saúde</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="flex items-center cursor-pointer text-red-600 focus:text-red-500"
+                  onClick={handleSignOut}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Sair</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button
+              className="bg-minipassos-purple hover:bg-minipassos-purple-dark"
+              onClick={() => navigate("/auth")}
+            >
+              Entrar
+            </Button>
+          )}
+
+          {/* Mobile Menu Button */}
+          {isMobile && (
+            <Button
+              variant="ghost"
+              className="ml-2"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </Button>
           )}
         </div>
+      </div>
 
-        {isMobile ? (
-          <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="icon" className="md:hidden">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right">
-              <SheetHeader>
-                <SheetTitle>MiniPassos</SheetTitle>
-              </SheetHeader>
-              <div className="py-4">
-                <nav className="flex flex-col gap-1">
-                  {routes.map((route) => (
-                    <Link
-                      key={route.path}
-                      to={route.path}
-                      onClick={() => setIsOpen(false)}
-                      className={`flex items-center py-3 px-3 rounded-md transition-colors ${
-                        location.pathname === route.path
-                          ? "bg-accent text-accent-foreground"
-                          : "hover:bg-accent hover:text-accent-foreground"
-                      }`}
-                    >
-                      {route.icon}
-                      {route.name}
-                    </Link>
-                  ))}
-                </nav>
-
-                <div className="mt-6">
-                  {user ? (
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start"
-                      onClick={handleSignOut}
-                    >
-                      <LogOut className="h-4 w-4 mr-2" />
-                      Sair
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="default"
-                      className="w-full"
+      {/* Mobile Menu */}
+      {isMobile && (
+        <div
+          ref={menuRef}
+          className={cn(
+            "fixed inset-0 z-40 bg-white transform transition-transform duration-300 ease-in-out",
+            isMenuOpen ? "translate-x-0" : "translate-x-full"
+          )}
+        >
+          <div className="flex justify-between items-center h-16 px-4 border-b">
+            <Link to="/" className="flex items-center">
+              <img src={logo} alt="MiniPassos" className="h-8" />
+            </Link>
+            <Button
+              variant="ghost"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <X className="h-6 w-6" />
+            </Button>
+          </div>
+          <nav className="p-4 space-y-2">
+            {user ? (
+              <>
+                <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg mb-4">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={userProfile?.avatar_url || ""} />
+                    <AvatarFallback className="bg-minipassos-purple text-white">
+                      {userProfile?.full_name?.charAt(0) || user?.email?.charAt(0) || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <div className="font-medium">{userProfile?.full_name || "Usuário"}</div>
+                    <Button 
+                      variant="link" 
+                      className="p-0 h-auto text-xs text-minipassos-purple"
                       onClick={() => {
-                        navigate("/auth");
-                        setIsOpen(false);
+                        navigate("/perfil");
+                        setIsMenuOpen(false);
                       }}
                     >
-                      Entrar
+                      Ver perfil
                     </Button>
-                  )}
+                  </div>
                 </div>
-              </div>
-            </SheetContent>
-          </Sheet>
-        ) : (
-          <div className="flex items-center gap-4">
-            {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="relative">
-                    <User className="h-4 w-4 mr-2" />
-                    <span className="hidden sm:inline-block">Conta</span>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    navigate("/dashboard");
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  Dashboard
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    navigate("/atividades");
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  Atividades
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    navigate("/biblioteca");
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  Biblioteca
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    navigate("/historico-medico");
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  Saúde
+                </Button>
+                
+                {userRole === 'professional' && (
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    onClick={() => {
+                      navigate("/criar-conteudo");
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    Criar Conteúdo
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>Minha conta</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate("/biblioteca")}>
-                    <Library className="h-4 w-4 mr-2" />
-                    Biblioteca
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/historico-medico")}>
-                    <Stethoscope className="h-4 w-4 mr-2" />
-                    Histórico Médico
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/perfil")}>
-                    <Baby className="h-4 w-4 mr-2" />
-                    Perfil do bebê
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/dashboard")}>
-                    <FileText className="h-4 w-4 mr-2" />
-                    Dashboard
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/assinatura")}>
-                    <CreditCard className="h-4 w-4 mr-2" />
-                    Assinatura
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut}>
-                    <LogOut className="h-4 w-4 mr-2" />
+                )}
+                
+                <div className="pt-4 border-t mt-4">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+                    onClick={() => {
+                      handleSignOut();
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
                     Sair
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  </Button>
+                </div>
+              </>
             ) : (
-              <Button onClick={() => navigate("/auth")}>Entrar</Button>
+              <>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    navigate("/");
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  Início
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  Sobre
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    navigate("/assinatura");
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  Planos
+                </Button>
+                <div className="pt-4">
+                  <Button
+                    className="w-full bg-minipassos-purple hover:bg-minipassos-purple-dark"
+                    onClick={() => {
+                      navigate("/auth");
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    Entrar
+                  </Button>
+                </div>
+              </>
             )}
-          </div>
-        )}
-      </div>
+          </nav>
+        </div>
+      )}
     </header>
   );
 };

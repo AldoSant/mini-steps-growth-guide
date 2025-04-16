@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -17,6 +18,7 @@ import Subscription from "@/pages/Subscription";
 import MedicalHistory from "@/pages/MedicalHistory";
 import NotFound from "@/pages/NotFound";
 import CreateContent from "@/pages/CreateContent";
+import UserProfile from "@/pages/UserProfile";
 
 // Context Providers
 import { AuthProvider } from "@/context/AuthContext";
@@ -65,6 +67,7 @@ const App = () => {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/diario" element={<BabyDiary />} />
               <Route path="/perfil/:id" element={<BabyProfile />} />
+              <Route path="/perfil" element={<UserProfile />} />
               <Route path="/atividades" element={<Activities />} />
               <Route path="/atividades/:id" element={<ActivityDetails />} />
               <Route path="/biblioteca" element={<Library />} />

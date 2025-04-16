@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/context/AuthContext";
@@ -29,17 +29,21 @@ import {
   Info
 } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const CreateContent = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { state } = location;
   const { toast } = useToast();
   const { user, userProfile, isProfileLoading } = useAuth();
   const queryClient = useQueryClient();
-  const [contentType, setContentType] = useState<'article' | 'activity'>('article');
+  const [contentType, setContentType] = useState<'article' | 'activity'>(
+    state?.defaultTab === 'activity' ? 'activity' : 'article'
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // For articles
