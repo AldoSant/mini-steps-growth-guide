@@ -1,5 +1,5 @@
-
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useActivity } from "@/context/ActivityContext";
@@ -12,10 +12,12 @@ import { getCurrentAgeInMonths } from "@/lib/date-utils";
 import { Search, Filter } from "lucide-react";
 import { Activity } from "@/types";
 import ContentCreationButtons from "@/components/ContentCreationButtons";
+import { supabase } from "@/integrations/supabase/client";
 
 const Activities = () => {
   const { activities, setActivities } = useActivity();
   const { currentBaby } = useBaby();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [filteredActivities, setFilteredActivities] = useState<Activity[]>([]);
