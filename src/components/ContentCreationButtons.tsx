@@ -12,9 +12,8 @@ interface ContentCreationButtonsProps {
 
 const ContentCreationButtons = ({ type, className = "" }: ContentCreationButtonsProps) => {
   const navigate = useNavigate();
-  const { userRole, userProfile } = useAuth();
+  const { userRole } = useAuth();
   const isProfessional = userRole === 'professional' || userRole === 'admin';
-  const isVerified = userProfile?.is_verified;
 
   if (!isProfessional) {
     return null;
@@ -23,9 +22,8 @@ const ContentCreationButtons = ({ type, className = "" }: ContentCreationButtons
   return (
     <div className={className}>
       <Button
-        className="bg-minipassos-purple hover:bg-minipassos-purple-dark"
+        className="bg-marcos-purple hover:bg-marcos-purple-dark"
         onClick={() => navigate("/criar-conteudo", { state: { defaultTab: type === "articles" ? "article" : "activity" }})}
-        disabled={!isVerified}
       >
         <PlusCircle className="h-4 w-4 mr-2" />
         {type === "articles" ? "Criar Artigo" : "Criar Atividade"}

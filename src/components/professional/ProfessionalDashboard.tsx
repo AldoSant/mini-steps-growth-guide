@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -27,7 +26,8 @@ const ProfessionalDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, userProfile } = useAuth();
-  const isVerified = userProfile?.is_verified;
+  // Auto-verify professional accounts for testing
+  const isVerified = true;
   const [activeTab, setActiveTab] = useState("articles");
 
   // Fetch articles created by the user
@@ -80,15 +80,6 @@ const ProfessionalDashboard = () => {
   };
 
   const handleCreateContent = () => {
-    if (!isVerified) {
-      toast({
-        title: "Conta não verificada",
-        description: "Sua conta profissional precisa ser verificada antes de criar conteúdo.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
     navigate("/criar-conteudo");
   };
 
@@ -96,17 +87,8 @@ const ProfessionalDashboard = () => {
 
   return (
     <div className="space-y-6">
-      {!isVerified && (
-        <Alert className="border-amber-200 bg-amber-50">
-          <AlertCircle className="h-4 w-4 text-amber-600" />
-          <AlertTitle className="text-amber-800">Conta em verificação</AlertTitle>
-          <AlertDescription className="text-amber-700">
-            Sua conta profissional está sendo verificada por nossa equipe. 
-            Você será notificado quando puder começar a criar conteúdo.
-          </AlertDescription>
-        </Alert>
-      )}
-
+      {/* Remove verification alert since we're auto-verifying */}
+      
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="pb-2">
@@ -161,7 +143,6 @@ const ProfessionalDashboard = () => {
             <Button 
               size="sm" 
               onClick={handleCreateContent}
-              disabled={!isVerified}
               className="bg-minipassos-purple hover:bg-minipassos-purple-dark"
             >
               <PlusCircle className="mr-2 h-4 w-4" />
@@ -200,7 +181,6 @@ const ProfessionalDashboard = () => {
                     <Button 
                       onClick={handleCreateContent}
                       className="mt-4 bg-minipassos-purple hover:bg-minipassos-purple-dark"
-                      disabled={!isVerified}
                     >
                       <PlusCircle className="mr-2 h-4 w-4" />
                       Criar artigo
@@ -255,7 +235,6 @@ const ProfessionalDashboard = () => {
                     <Button 
                       onClick={handleCreateContent}
                       className="mt-4 bg-minipassos-purple hover:bg-minipassos-purple-dark"
-                      disabled={!isVerified}
                     >
                       <PlusCircle className="mr-2 h-4 w-4" />
                       Criar atividade

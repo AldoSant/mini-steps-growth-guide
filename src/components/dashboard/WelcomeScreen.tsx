@@ -14,16 +14,16 @@ const WelcomeScreen = ({ isProfessional = false }: WelcomeScreenProps) => {
   const navigate = useNavigate();
   const { userProfile } = useAuth();
   
-  // Check if the professional account is verified
-  const isVerified = isProfessional && userProfile?.is_verified;
+  // Professional accounts are auto-verified for this implementation
+  const isVerified = isProfessional;
 
   return (
     <div className="flex flex-col items-center justify-center py-12">
-      <div className="text-minipassos-purple mb-6">
+      <div className="text-marcos-purple mb-6">
         <Baby size={64} />
       </div>
       
-      <h2 className="text-2xl font-bold text-gray-800 mb-2">Bem-vindo ao MiniPassos!</h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-2">Bem-vindo ao Marcos Baby!</h2>
       
       {isProfessional ? (
         <div className="space-y-8 w-full max-w-4xl">
@@ -37,7 +37,7 @@ const WelcomeScreen = ({ isProfessional = false }: WelcomeScreenProps) => {
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center text-lg">
-                  <FileText className="h-5 w-5 mr-2 text-minipassos-purple" />
+                  <FileText className="h-5 w-5 mr-2 text-marcos-purple" />
                   Criar Conteúdo
                 </CardTitle>
               </CardHeader>
@@ -49,7 +49,7 @@ const WelcomeScreen = ({ isProfessional = false }: WelcomeScreenProps) => {
                 </p>
                 <Button 
                   variant={isVerified ? "default" : "outline"}
-                  className={isVerified ? "w-full bg-minipassos-purple hover:bg-minipassos-purple-dark" : "w-full"}
+                  className={isVerified ? "w-full bg-marcos-purple hover:bg-marcos-purple-dark" : "w-full"}
                   onClick={() => navigate("/criar-conteudo")}
                   disabled={!isVerified}
                 >
@@ -62,7 +62,7 @@ const WelcomeScreen = ({ isProfessional = false }: WelcomeScreenProps) => {
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center text-lg">
-                  <BookOpen className="h-5 w-5 mr-2 text-minipassos-purple" />
+                  <BookOpen className="h-5 w-5 mr-2 text-marcos-purple" />
                   Explorar Biblioteca
                 </CardTitle>
               </CardHeader>
@@ -72,7 +72,7 @@ const WelcomeScreen = ({ isProfessional = false }: WelcomeScreenProps) => {
                 </p>
                 <Button 
                   onClick={() => navigate("/biblioteca")}
-                  className="w-full bg-minipassos-purple hover:bg-minipassos-purple-dark"
+                  className="w-full bg-marcos-purple hover:bg-marcos-purple-dark"
                 >
                   Acessar biblioteca
                 </Button>
@@ -82,7 +82,7 @@ const WelcomeScreen = ({ isProfessional = false }: WelcomeScreenProps) => {
             <Card className="md:col-span-2">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center text-lg">
-                  <Baby className="h-5 w-5 mr-2 text-minipassos-purple" />
+                  <Baby className="h-5 w-5 mr-2 text-marcos-purple" />
                   Registrar um Bebê
                 </CardTitle>
               </CardHeader>

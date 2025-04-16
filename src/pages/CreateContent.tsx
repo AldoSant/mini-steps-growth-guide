@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -39,7 +38,7 @@ const CreateContent = () => {
   const location = useLocation();
   const { state } = location;
   const { toast } = useToast();
-  const { user, userProfile, isProfileLoading } = useAuth();
+  const { user, userProfile, userRole, isProfileLoading } = useAuth();
   const queryClient = useQueryClient();
   const [contentType, setContentType] = useState<'article' | 'activity'>(
     state?.defaultTab === 'activity' ? 'activity' : 'article'
@@ -52,8 +51,11 @@ const CreateContent = () => {
   // For activities
   const { register: registerActivity, handleSubmit: handleSubmitActivity, formState: { errors: errorsActivity } } = useForm();
   
-  // Redirect if not verified professional
-  if (!isProfileLoading && (!userProfile || userProfile.user_role !== 'professional' || !userProfile.is_verified)) {
+  // Check if the user is a professional or admin and is allowed to access this page
+  const isProfessional = userRole === 'professional' || userRole === 'admin';
+  
+  // Redirect if not a professional
+  if (!isProfileLoading && (!isProfessional)) {
     navigate("/dashboard");
     return null;
   }

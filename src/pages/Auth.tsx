@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -44,7 +43,6 @@ const Auth = () => {
   const [passwordError, setPasswordError] = useState("");
   const [fullNameError, setFullNameError] = useState("");
   
-  // Professional account fields
   const [userRole, setUserRole] = useState<'parent' | 'professional'>('parent');
   const [professionalTitle, setProfessionalTitle] = useState("");
   const [professionalSpecialization, setProfessionalSpecialization] = useState("");
@@ -52,14 +50,12 @@ const Auth = () => {
   const [showProfessionalFields, setShowProfessionalFields] = useState(false);
   const [step, setStep] = useState(1);
 
-  // Redirect to dashboard if already logged in
   useEffect(() => {
     if (user) {
       navigate("/dashboard");
     }
   }, [user, navigate]);
 
-  // Email validation
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) {
@@ -73,7 +69,6 @@ const Auth = () => {
     return true;
   };
 
-  // Password validation
   const validatePassword = (password: string, isLogin = false) => {
     if (!password) {
       setPasswordError("Senha é obrigatória");
@@ -86,7 +81,6 @@ const Auth = () => {
     return true;
   };
 
-  // Name validation
   const validateFullName = (name: string) => {
     if (!name) {
       setFullNameError("Nome é obrigatório");
@@ -99,7 +93,6 @@ const Auth = () => {
     return true;
   };
 
-  // Validate professional fields
   const validateProfessionalFields = () => {
     if (userRole !== 'professional') return true;
     
@@ -137,7 +130,6 @@ const Auth = () => {
     e.preventDefault();
     
     if (step === 1) {
-      // Validation of basic fields
       const isEmailValid = validateEmail(email);
       const isPasswordValid = validatePassword(password);
       const isFullNameValid = validateFullName(fullName);
@@ -146,7 +138,6 @@ const Auth = () => {
         return;
       }
       
-      // If user chose professional role, show additional fields
       if (userRole === 'professional') {
         setShowProfessionalFields(true);
         setStep(2);
@@ -154,9 +145,7 @@ const Auth = () => {
       }
     }
     
-    // For professionals at step 2 or parents continuing from step 1
     if ((userRole === 'professional' && step === 2) || userRole === 'parent') {
-      // Validate professional fields if applicable
       if (userRole === 'professional' && !validateProfessionalFields()) {
         return;
       }
@@ -164,7 +153,6 @@ const Auth = () => {
       setLoading(true);
       
       try {
-        // Register the user
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
@@ -177,19 +165,19 @@ const Auth = () => {
 
         if (error) throw error;
         
-        // If registration was successful, update the profile with role and professional data
         if (data.user) {
           const profileData: any = {
             user_role: userRole,
+            full_name: fullName
           };
           
           if (userRole === 'professional') {
             profileData.professional_title = professionalTitle;
             profileData.professional_specialization = professionalSpecialization;
             profileData.professional_bio = professionalBio;
+            profileData.is_verified = true;
           }
           
-          // Update the profile
           const { error: profileError } = await supabase
             .from('profiles')
             .update(profileData)
@@ -205,7 +193,6 @@ const Auth = () => {
           description: "Verifique seu e-mail para confirmar o cadastro."
         });
 
-        // Redirect to dashboard if user was created immediately
         if (data.user) {
           navigate("/dashboard");
         }
@@ -223,7 +210,7 @@ const Auth = () => {
         });
       } finally {
         setLoading(false);
-        setStep(1); // Reset step
+        setStep(1);
       }
     }
   };
@@ -231,7 +218,6 @@ const Auth = () => {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validation of email and password
     const isEmailValid = validateEmail(email);
     const isPasswordValid = validatePassword(password, true);
     
@@ -279,7 +265,6 @@ const Auth = () => {
     }
   };
 
-  // Reset fields when returning to step 1
   const handleBackToStep1 = () => {
     setStep(1);
     setShowProfessionalFields(false);
@@ -297,7 +282,6 @@ const Auth = () => {
         </CardHeader>
         
         {showProfessionalFields ? (
-          // Step 2: Professional fields form
           <CardContent>
             <form onSubmit={handleSignUp} className="space-y-4">
               <div className="flex items-center justify-between mb-4">
@@ -384,7 +368,6 @@ const Auth = () => {
             </form>
           </CardContent>
         ) : (
-          // Step 1: Default login/register tabs
           <Tabs defaultValue="login" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="login">Login</TabsTrigger>

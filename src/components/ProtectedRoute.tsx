@@ -12,7 +12,7 @@ const ProtectedRoute = () => {
   if (loading || isProfileLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse text-minipassos-purple">Carregando...</div>
+        <div className="animate-pulse text-marcos-purple">Carregando...</div>
       </div>
     );
   }
@@ -22,13 +22,8 @@ const ProtectedRoute = () => {
     return <Navigate to="/auth" replace />;
   }
   
-  // If trying to access professional-only routes without being a professional
+  // If trying to access professional-only routes without being a professional or admin
   if (isProfessionalOnlyRoute && userRole !== 'professional' && userRole !== 'admin') {
-    return <Navigate to="/dashboard" replace />;
-  }
-  
-  // If trying to access professional-only routes as a professional but not verified
-  if (isProfessionalOnlyRoute && userRole === 'professional' && !userProfile?.is_verified) {
     return <Navigate to="/dashboard" replace />;
   }
   
