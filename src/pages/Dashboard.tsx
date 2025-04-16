@@ -59,7 +59,7 @@ const Dashboard = () => {
               <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
               {isProfessional && (
                 <div className="flex items-center mt-1">
-                  <Badge className="bg-minipassos-purple">Conta Profissional</Badge>
+                  <Badge className="bg-marcos-purple">Conta Profissional</Badge>
                   {userProfile && !userProfile.is_verified && (
                     <Badge variant="outline" className="ml-2 text-amber-600 border-amber-600">
                       Em verificação
@@ -78,7 +78,7 @@ const Dashboard = () => {
               <div className="flex gap-2">
                 <Badge 
                   variant={viewMode === 'parent' ? 'default' : 'outline'}
-                  className={`cursor-pointer ${viewMode === 'parent' ? 'bg-minipassos-purple' : ''}`}
+                  className={`cursor-pointer ${viewMode === 'parent' ? 'bg-marcos-purple' : ''}`}
                   onClick={() => setViewMode('parent')}
                 >
                   <LayoutGrid className="h-4 w-4 mr-1" />
@@ -86,7 +86,7 @@ const Dashboard = () => {
                 </Badge>
                 <Badge 
                   variant={viewMode === 'professional' ? 'default' : 'outline'} 
-                  className={`cursor-pointer ${viewMode === 'professional' ? 'bg-minipassos-purple' : ''}`}
+                  className={`cursor-pointer ${viewMode === 'professional' ? 'bg-marcos-purple' : ''}`}
                   onClick={() => setViewMode('professional')}
                 >
                   <FileText className="h-4 w-4 mr-1" />

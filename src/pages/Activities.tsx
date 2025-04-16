@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -144,7 +145,7 @@ const Activities = () => {
                   
                   <CardHeader>
                     <div className="flex items-center justify-between">
-                      <div className="text-xs font-medium bg-minipassos-purple/10 text-minipassos-purple rounded-full px-2 py-0.5">
+                      <div className="text-xs font-medium bg-marcos-purple/10 text-marcos-purple rounded-full px-2 py-0.5">
                         {activity.category}
                       </div>
                       <div className="text-xs text-gray-500">
@@ -160,7 +161,7 @@ const Activities = () => {
                   
                   <CardFooter>
                     <Button 
-                      className="w-full bg-minipassos-purple hover:bg-minipassos-purple-dark"
+                      className="w-full bg-marcos-purple hover:bg-marcos-purple-dark"
                       onClick={() => navigate(`/atividades/${activity.id}`)}
                     >
                       Ver Detalhes

@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>MiniPassos - Sem conexão</title>
+  <title>Marcos Baby - Sem conexão</title>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#8b5cf6">
   <style>
@@ -202,7 +202,7 @@
       </svg>
     </div>
     <h1>Sem conexão</h1>
-    <p>Parece que você está offline no momento. Algumas funcionalidades do MiniPassos não estão disponíveis sem conexão à internet.</p>
+    <p>Parece que você está offline no momento. Algumas funcionalidades do Marcos Baby não estão disponíveis sem conexão à internet.</p>
     <button class="button" onClick="window.location.reload()">Tentar novamente</button>
     
     <div class="cached-content">
@@ -237,7 +237,7 @@
     
     // Tenta carregar registros salvos offline
     if ('serviceWorker' in navigator && 'caches' in window) {
-      caches.open('minipassos-cache-v4').then(cache => {
+      caches.open('marcos-baby-cache-v4').then(cache => {
         cache.keys().then(keys => {
           if (keys.length === 0) {
             const noContent = document.createElement('p');

@@ -1,3 +1,4 @@
+
 import { ArrowRight, Baby, BookOpen, Calendar, Activity, Image, BarChart, Check, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -31,8 +32,8 @@ const Index = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Feature 1 */}
-              <div className="feature-card bg-minipassos-purple-light">
-                <div className="feature-icon bg-minipassos-purple">
+              <div className="feature-card bg-marcos-purple-light">
+                <div className="feature-icon bg-marcos-purple">
                   <BarChart size={24} />
                 </div>
                 <h3 className="text-lg font-bold text-gray-800 mb-2">Marcos de Desenvolvimento</h3>
@@ -42,8 +43,8 @@ const Index = () => {
               </div>
               
               {/* Feature 2 */}
-              <div className="feature-card bg-minipassos-blue-light">
-                <div className="feature-icon bg-minipassos-blue">
+              <div className="feature-card bg-marcos-blue-light">
+                <div className="feature-icon bg-marcos-blue">
                   <Activity size={24} />
                 </div>
                 <h3 className="text-lg font-bold text-gray-800 mb-2">Atividades Diárias</h3>
@@ -53,8 +54,8 @@ const Index = () => {
               </div>
               
               {/* Feature 3 */}
-              <div className="feature-card bg-minipassos-green-light">
-                <div className="feature-icon bg-minipassos-green">
+              <div className="feature-card bg-marcos-green-light">
+                <div className="feature-icon bg-marcos-green">
                   <Image size={24} />
                 </div>
                 <h3 className="text-lg font-bold text-gray-800 mb-2">Diário do Bebê</h3>
@@ -64,7 +65,7 @@ const Index = () => {
               </div>
               
               {/* Feature 4 */}
-              <div className="feature-card bg-minipassos-yellow">
+              <div className="feature-card bg-marcos-yellow">
                 <div className="feature-icon bg-[#F59E0B]">
                   <Calendar size={24} />
                 </div>
@@ -75,7 +76,7 @@ const Index = () => {
               </div>
               
               {/* Feature 5 */}
-              <div className="feature-card bg-minipassos-peach">
+              <div className="feature-card bg-marcos-peach">
                 <div className="feature-icon bg-[#F97316]">
                   <BookOpen size={24} />
                 </div>
@@ -86,8 +87,8 @@ const Index = () => {
               </div>
               
               {/* Feature 6 */}
-              <div className="feature-card bg-minipassos-purple-light">
-                <div className="feature-icon bg-minipassos-purple-dark">
+              <div className="feature-card bg-marcos-purple-light">
+                <div className="feature-icon bg-marcos-purple-dark">
                   <Stethoscope size={24} />
                 </div>
                 <h3 className="text-lg font-bold text-gray-800 mb-2">Histórico Médico</h3>
@@ -118,7 +119,7 @@ const Index = () => {
                     "Lembretes de consultas e vacinas"
                   ].map((item, index) => (
                     <li key={index} className="flex items-start gap-3">
-                      <div className="rounded-full p-1 bg-minipassos-purple/10 text-minipassos-purple mt-1">
+                      <div className="rounded-full p-1 bg-marcos-purple/10 text-marcos-purple mt-1">
                         <Check size={14} />
                       </div>
                       <span className="text-gray-700">{item}</span>
@@ -128,7 +129,7 @@ const Index = () => {
                 
                 {!user && (
                   <div className="mt-4">
-                    <Button asChild size="lg" className="bg-minipassos-purple hover:bg-minipassos-purple-dark">
+                    <Button asChild size="lg" className="bg-marcos-purple hover:bg-marcos-purple-dark">
                       <Link to="/auth">
                         Criar uma conta
                         <ArrowRight className="ml-2 h-4 w-4" />
@@ -143,14 +144,14 @@ const Index = () => {
                   <BabyForm />
                 ) : (
                   <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 text-center space-y-6">
-                    <Baby size={60} className="mx-auto text-minipassos-purple" />
+                    <Baby size={60} className="mx-auto text-marcos-purple" />
                     <h3 className="text-xl font-bold">Faça login para cadastrar seu bebê</h3>
                     <p className="text-gray-600">
                       Crie uma conta gratuita ou faça login para começar a acompanhar o desenvolvimento do seu bebê.
                     </p>
                     <Button 
                       asChild 
-                      className="w-full bg-minipassos-purple hover:bg-minipassos-purple-dark"
+                      className="w-full bg-marcos-purple hover:bg-marcos-purple-dark"
                     >
                       <Link to="/auth">
                         Entrar ou Cadastrar
@@ -222,7 +223,7 @@ const Index = () => {
               <p className="text-gray-600 text-lg mb-6">
                 Escolha o plano ideal para acompanhar o crescimento do seu bebê com conteúdo exclusivo.
               </p>
-              <Button asChild size="lg" className="bg-minipassos-purple hover:bg-minipassos-purple-dark">
+              <Button asChild size="lg" className="bg-marcos-purple hover:bg-marcos-purple-dark">
                 <Link to="/assinatura">
                   Ver Planos de Assinatura
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -264,15 +265,15 @@ const Index = () => {
                   ]
                 }
               ].map((plan, index) => (
-                <div key={index} className={`bg-white rounded-xl border-2 p-6 shadow-sm relative ${plan.popular ? "border-minipassos-purple" : "border-gray-200"}`}>
+                <div key={index} className={`bg-white rounded-xl border-2 p-6 shadow-sm relative ${plan.popular ? "border-marcos-purple" : "border-gray-200"}`}>
                   {plan.popular && (
-                    <div className="absolute -top-3 left-0 right-0 mx-auto w-32 bg-minipassos-purple text-white text-xs font-bold tracking-wider uppercase py-1 px-2 rounded-full text-center">
+                    <div className="absolute -top-3 left-0 right-0 mx-auto w-32 bg-marcos-purple text-white text-xs font-bold tracking-wider uppercase py-1 px-2 rounded-full text-center">
                       Mais popular
                     </div>
                   )}
                   <div className="text-center mb-4">
                     <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
-                    <p className="text-2xl font-bold text-minipassos-purple-dark">{plan.price}<span className="text-sm text-gray-500">/mês</span></p>
+                    <p className="text-2xl font-bold text-marcos-purple-dark">{plan.price}<span className="text-sm text-gray-500">/mês</span></p>
                   </div>
                   <ul className="space-y-2 mb-6">
                     {plan.features.map((feature, i) => (
@@ -282,7 +283,7 @@ const Index = () => {
                       </li>
                     ))}
                   </ul>
-                  <Button asChild variant={plan.popular ? "default" : "outline"} className={`w-full ${plan.popular ? "bg-minipassos-purple hover:bg-minipassos-purple-dark" : ""}`}>
+                  <Button asChild variant={plan.popular ? "default" : "outline"} className={`w-full ${plan.popular ? "bg-marcos-purple hover:bg-marcos-purple-dark" : ""}`}>
                     <Link to="/assinatura">
                       Saiba mais
                     </Link>
@@ -292,7 +293,7 @@ const Index = () => {
             </div>
             
             <div className="mt-12 text-center">
-              <Button asChild size="lg" className="bg-minipassos-purple hover:bg-minipassos-purple-dark">
+              <Button asChild size="lg" className="bg-marcos-purple hover:bg-marcos-purple-dark">
                 <Link to={user ? "/dashboard" : "/auth"}>
                   {user ? "Ir para o Dashboard" : "Começar gratuitamente"}
                   <ArrowRight className="ml-2 h-4 w-4" />

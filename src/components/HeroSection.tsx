@@ -41,7 +41,7 @@ const HeroSection = () => {
       <div className="container relative z-10 py-12 md:py-20">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
           <div className="space-y-4 md:space-y-6">
-            <div className="inline-block rounded-full bg-minipassos-purple/10 px-4 py-1.5 text-sm font-medium text-minipassos-purple">
+            <div className="inline-block rounded-full bg-marcos-purple/10 px-4 py-1.5 text-sm font-medium text-marcos-purple">
               Lançamento 2025
             </div>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight text-gray-900">
@@ -52,7 +52,7 @@ const HeroSection = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
-              <Button asChild size="lg" className="bg-minipassos-purple hover:bg-minipassos-purple-dark w-full sm:w-auto">
+              <Button asChild size="lg" className="bg-marcos-purple hover:bg-marcos-purple-dark w-full sm:w-auto">
                 <Link to="/auth">
                   Começar agora
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -69,17 +69,17 @@ const HeroSection = () => {
 
             <div className="flex items-center gap-4 pt-2">
               <div className="flex -space-x-2">
-                <div className="h-8 w-8 rounded-full border-2 border-white bg-minipassos-purple-light"></div>
-                <div className="h-8 w-8 rounded-full border-2 border-white bg-minipassos-green-light"></div>
-                <div className="h-8 w-8 rounded-full border-2 border-white bg-minipassos-blue-light"></div>
+                <div className="h-8 w-8 rounded-full border-2 border-white bg-marcos-purple-light"></div>
+                <div className="h-8 w-8 rounded-full border-2 border-white bg-marcos-green-light"></div>
+                <div className="h-8 w-8 rounded-full border-2 border-white bg-marcos-blue-light"></div>
               </div>
               <p className="text-sm text-gray-500">
-                Mais de <span className="font-bold text-minipassos-purple">10.000</span> famílias já utilizam
+                Mais de <span className="font-bold text-marcos-purple">10.000</span> famílias já utilizam
               </p>
             </div>
           </div>
 
-          <div className="aspect-square max-w-xs mx-auto md:max-w-none rounded-full bg-gradient-to-br from-minipassos-purple-light via-white to-minipassos-blue-light p-6 sm:p-8 flex items-center justify-center">
+          <div className="aspect-square max-w-xs mx-auto md:max-w-none rounded-full bg-gradient-to-br from-marcos-purple-light via-white to-marcos-blue-light p-6 sm:p-8 flex items-center justify-center">
             <div className="bg-white rounded-full p-4 sm:p-6 shadow-xl">
               <img src={logo} alt="Marcos Baby Logo" className="w-full max-w-[200px]" />
             </div>

@@ -1,5 +1,6 @@
-// Service Worker para MiniPassos PWA
-const CACHE_NAME = 'minipassos-cache-v5';
+
+// Service Worker para Marcos Baby PWA
+const CACHE_NAME = 'marcos-baby-cache-v5';
 const OFFLINE_URL = '/offline.html';
 
 // Recursos para cache imediato durante a instalação
@@ -256,10 +257,10 @@ self.addEventListener('push', (event) => {
   
   try {
     const data = event.data.json();
-    const title = data.title || 'MiniPassos';
+    const title = data.title || 'Marcos Baby';
     
     const options = {
-      body: data.body || 'Nova notificação do MiniPassos',
+      body: data.body || 'Nova notificação do Marcos Baby',
       icon: './logo192.png',
       badge: './favicon.ico',
       vibrate: [100, 50, 100],

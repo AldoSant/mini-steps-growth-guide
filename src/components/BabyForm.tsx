@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -161,7 +162,7 @@ const BabyForm = () => {
 
       <Button 
         type="submit" 
-        className="w-full bg-minipassos-purple hover:bg-minipassos-purple-dark"
+        className="w-full bg-marcos-purple hover:bg-marcos-purple-dark"
         disabled={loading}
       >
         {loading ? "Cadastrando..." : "Cadastrar Bebê"}

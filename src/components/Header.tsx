@@ -1,3 +1,4 @@
+
 import { useRef, useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -54,28 +55,28 @@ const Header = () => {
               <>
                 <Button
                   variant="ghost"
-                  className="text-gray-700 hover:text-minipassos-purple hover:bg-gray-100"
+                  className="text-gray-700 hover:text-marcos-purple hover:bg-gray-100"
                   onClick={() => navigate("/dashboard")}
                 >
                   Dashboard
                 </Button>
                 <Button
                   variant="ghost"
-                  className="text-gray-700 hover:text-minipassos-purple hover:bg-gray-100"
+                  className="text-gray-700 hover:text-marcos-purple hover:bg-gray-100"
                   onClick={() => navigate("/atividades")}
                 >
                   Atividades
                 </Button>
                 <Button
                   variant="ghost"
-                  className="text-gray-700 hover:text-minipassos-purple hover:bg-gray-100"
+                  className="text-gray-700 hover:text-marcos-purple hover:bg-gray-100"
                   onClick={() => navigate("/biblioteca")}
                 >
                   Biblioteca
                 </Button>
                 <Button
                   variant="ghost"
-                  className="text-gray-700 hover:text-minipassos-purple hover:bg-gray-100"
+                  className="text-gray-700 hover:text-marcos-purple hover:bg-gray-100"
                   onClick={() => navigate("/historico-medico")}
                 >
                   Saúde
@@ -85,20 +86,20 @@ const Header = () => {
               <>
                 <Button
                   variant="ghost"
-                  className="text-gray-700 hover:text-minipassos-purple hover:bg-gray-100"
+                  className="text-gray-700 hover:text-marcos-purple hover:bg-gray-100"
                   onClick={() => navigate("/")}
                 >
                   Início
                 </Button>
                 <Button
                   variant="ghost"
-                  className="text-gray-700 hover:text-minipassos-purple hover:bg-gray-100"
+                  className="text-gray-700 hover:text-marcos-purple hover:bg-gray-100"
                 >
                   Sobre
                 </Button>
                 <Button
                   variant="ghost"
-                  className="text-gray-700 hover:text-minipassos-purple hover:bg-gray-100"
+                  className="text-gray-700 hover:text-marcos-purple hover:bg-gray-100"
                   onClick={() => navigate("/assinatura")}
                 >
                   Planos
@@ -118,7 +119,7 @@ const Header = () => {
                 >
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={userProfile?.avatar_url || ""} />
-                    <AvatarFallback className="bg-minipassos-purple text-white">
+                    <AvatarFallback className="bg-marcos-purple text-white">
                       {userProfile?.full_name?.charAt(0) || user?.email?.charAt(0) || "U"}
                     </AvatarFallback>
                   </Avatar>
@@ -184,7 +185,7 @@ const Header = () => {
             </DropdownMenu>
           ) : (
             <Button
-              className="bg-minipassos-purple hover:bg-minipassos-purple-dark"
+              className="bg-marcos-purple hover:bg-marcos-purple-dark"
               onClick={() => navigate("/auth")}
             >
               Entrar
@@ -234,7 +235,7 @@ const Header = () => {
                 <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg mb-4">
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={userProfile?.avatar_url || ""} />
-                    <AvatarFallback className="bg-minipassos-purple text-white">
+                    <AvatarFallback className="bg-marcos-purple text-white">
                       {userProfile?.full_name?.charAt(0) || user?.email?.charAt(0) || "U"}
                     </AvatarFallback>
                   </Avatar>
@@ -242,7 +243,7 @@ const Header = () => {
                     <div className="font-medium">{userProfile?.full_name || "Usuário"}</div>
                     <Button 
                       variant="link" 
-                      className="p-0 h-auto text-xs text-minipassos-purple"
+                      className="p-0 h-auto text-xs text-marcos-purple"
                       onClick={() => {
                         navigate("/perfil");
                         setIsMenuOpen(false);
@@ -353,7 +354,7 @@ const Header = () => {
                 </Button>
                 <div className="pt-4">
                   <Button
-                    className="w-full bg-minipassos-purple hover:bg-minipassos-purple-dark"
+                    className="w-full bg-marcos-purple hover:bg-marcos-purple-dark"
                     onClick={() => {
                       navigate("/auth");
                       setIsMenuOpen(false);
