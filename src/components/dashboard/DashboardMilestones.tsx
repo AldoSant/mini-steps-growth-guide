@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, Clock } from "lucide-react";
+import { Check, Clock, Award } from "lucide-react";
 import MilestoneTimeline from "@/components/MilestoneTimeline";
 import { Milestone } from "@/types";
 import { useState } from "react";
