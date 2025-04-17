@@ -6,8 +6,8 @@ export async function getActivitiesByAge(ageInMonths: number) {
   const { data, error } = await supabase
     .from('activities')
     .select('*')
-    .lte('recommended_age_min', ageInMonths)
-    .gte('recommended_age_max', ageInMonths)
+    .lte('min_age_months', ageInMonths)
+    .gte('max_age_months', ageInMonths)
     .eq('published', true)
     .order('created_at', { ascending: false });
 
@@ -31,6 +31,36 @@ export async function createActivity(activity: Omit<Activity, 'id' | 'created_at
 
   if (error) {
     console.error('Erro ao criar atividade:', error);
+    throw error;
+  }
+
+  return data as Activity;
+}
+
+export async function getAllActivities() {
+  const { data, error } = await supabase
+    .from('activities')
+    .select('*')
+    .eq('published', true)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Erro ao buscar todas as atividades:', error);
+    throw error;
+  }
+
+  return data as Activity[];
+}
+
+export async function getActivityById(id: string) {
+  const { data, error } = await supabase
+    .from('activities')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    console.error('Erro ao buscar atividade por ID:', error);
     throw error;
   }
 
