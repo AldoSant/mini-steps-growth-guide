@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { useBaby } from "@/context/BabyContext";
 import { Activity } from "@/types";
-import { getCurrentAgeInMonths } from "@/lib/date-utils";
+import { getCurrentAgeInMonths, getAgeRangeText } from "@/lib/date-utils";
 import { getActivitiesByAge } from "@/lib/api/activities";
 import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
