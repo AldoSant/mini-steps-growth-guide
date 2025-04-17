@@ -51,13 +51,13 @@ const DashboardActivities = ({ currentBabyName }: DashboardActivitiesProps) => {
       <CardContent>
         {isLoading ? (
           <div className="flex justify-center py-8">
-            <Loader2 className="h-8 w-8 animate-spin text-minipassos-purple" />
+            <Loader2 className="h-8 w-8 animate-spin text-marcos-purple" />
           </div>
         ) : !activities || activities.length === 0 ? (
           <div className="text-center py-6">
             <p className="text-gray-500 mb-4">Ainda não há atividades disponíveis para a idade atual.</p>
             <Button 
-              className="bg-minipassos-purple hover:bg-minipassos-purple-dark"
+              className="bg-marcos-purple hover:bg-marcos-purple-dark"
               onClick={() => navigate("/atividades")}
             >
               Explorar todas as atividades
@@ -86,7 +86,7 @@ const DashboardActivities = ({ currentBabyName }: DashboardActivitiesProps) => {
             
             <div className="mt-6 flex justify-center">
               <Button 
-                className="bg-minipassos-purple hover:bg-minipassos-purple-dark"
+                className="bg-marcos-purple hover:bg-marcos-purple-dark"
                 onClick={() => navigate("/atividades")}
               >
                 Ver todas as atividades

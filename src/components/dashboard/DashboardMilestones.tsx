@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, Clock, Baby, BookOpen, Award, BarChart } from "lucide-react";
+import { Check, Clock } from "lucide-react";
 import MilestoneTimeline from "@/components/MilestoneTimeline";
 import { Milestone } from "@/types";
 import { useState } from "react";
@@ -47,7 +47,7 @@ const DashboardMilestones = ({
   
   // Calculate overall completion
   const overallCompletion = calculateCompletion(preparedMilestones);
-  
+
   return (
     <div className="space-y-6">
       <Card className="mb-6">
