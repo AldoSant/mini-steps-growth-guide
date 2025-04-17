@@ -13,6 +13,7 @@ export type Database = {
         Row: {
           category: string
           created_at: string
+          created_by: string | null
           creator_id: string | null
           description: string
           id: string
@@ -22,12 +23,15 @@ export type Database = {
           max_age_months: number
           min_age_months: number
           published: boolean | null
+          recommended_age_max: number | null
+          recommended_age_min: number | null
           title: string
           video_url: string | null
         }
         Insert: {
           category: string
           created_at?: string
+          created_by?: string | null
           creator_id?: string | null
           description: string
           id?: string
@@ -37,12 +41,15 @@ export type Database = {
           max_age_months: number
           min_age_months: number
           published?: boolean | null
+          recommended_age_max?: number | null
+          recommended_age_min?: number | null
           title: string
           video_url?: string | null
         }
         Update: {
           category?: string
           created_at?: string
+          created_by?: string | null
           creator_id?: string | null
           description?: string
           id?: string
@@ -52,6 +59,8 @@ export type Database = {
           max_age_months?: number
           min_age_months?: number
           published?: boolean | null
+          recommended_age_max?: number | null
+          recommended_age_min?: number | null
           title?: string
           video_url?: string | null
         }
@@ -449,6 +458,8 @@ export type Database = {
       milestones: {
         Row: {
           age_months: number
+          age_range_max: number | null
+          age_range_min: number | null
           category: string
           created_at: string
           description: string
@@ -457,6 +468,8 @@ export type Database = {
         }
         Insert: {
           age_months: number
+          age_range_max?: number | null
+          age_range_min?: number | null
           category: string
           created_at?: string
           description: string
@@ -465,6 +478,8 @@ export type Database = {
         }
         Update: {
           age_months?: number
+          age_range_max?: number | null
+          age_range_min?: number | null
           category?: string
           created_at?: string
           description?: string
