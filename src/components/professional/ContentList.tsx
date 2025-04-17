@@ -1,8 +1,9 @@
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Clock, Edit3 } from "lucide-react";
+import { ArrowRight, Clock, Edit3, BookOpen, Play, PlusCircle } from "lucide-react";
 import { Article, Activity } from "@/types";
+import { useNavigate } from "react-router-dom";
 
 interface ContentListProps {
   content: Article[] | Activity[];
@@ -17,6 +18,7 @@ const ContentList = ({
   isLoading, 
   onCreateContent 
 }: ContentListProps) => {
+  const navigate = useNavigate();
   const isEmpty = content.length === 0;
   const isArticles = contentType === 'articles';
   const ContentIcon = isArticles ? BookOpen : Play;
@@ -27,6 +29,17 @@ const ContentList = ({
       day: '2-digit',
       month: '2-digit',
       year: 'numeric'
+    });
+  };
+  
+  const handleEditContent = (item: Article | Activity) => {
+    // Navigate to edit content page with the item id
+    navigate("/criar-conteudo", { 
+      state: { 
+        editMode: true,
+        contentId: item.id,
+        defaultTab: isArticles ? 'article' : 'activity' 
+      } 
     });
   };
 
@@ -41,7 +54,7 @@ const ContentList = ({
         <p>Você ainda não criou {isArticles ? 'nenhum artigo' : 'nenhuma atividade'}.</p>
         <Button 
           onClick={onCreateContent}
-          className="mt-4 bg-minipassos-purple hover:bg-minipassos-purple-dark"
+          className="mt-4 bg-marcos-purple hover:bg-marcos-purple-dark"
         >
           <PlusCircle className="mr-2 h-4 w-4" />
           Criar {isArticles ? 'artigo' : 'atividade'}
@@ -88,11 +101,21 @@ const ContentList = ({
             </div>
           </div>
           <div className="flex gap-2 w-full md:w-auto">
-            <Button variant="outline" size="sm" className="flex-1 md:flex-none">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex-1 md:flex-none"
+              onClick={() => handleEditContent(item)}
+            >
               <Edit3 className="h-4 w-4 mr-2" />
               Editar
             </Button>
-            <Button variant="ghost" size="sm" className="flex-1 md:flex-none">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="flex-1 md:flex-none"
+              onClick={() => navigate(isArticles ? `/biblioteca/${item.id}` : `/atividades/${item.id}`)}
+            >
               <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
@@ -102,5 +125,4 @@ const ContentList = ({
   );
 };
 
-import { BookOpen, Play, PlusCircle } from "lucide-react";
 export default ContentList;

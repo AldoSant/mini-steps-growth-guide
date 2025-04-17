@@ -1,4 +1,3 @@
-
 import { Baby, Sparkles, FileText, BookOpen, PlusCircle } from "lucide-react";
 import RegisterBaby from "@/components/RegisterBaby";
 import { Button } from "@/components/ui/button";
@@ -15,7 +14,7 @@ const WelcomeScreen = ({ isProfessional = false }: WelcomeScreenProps) => {
   const { userProfile } = useAuth();
   
   // Professional accounts are auto-verified for this implementation
-  const isVerified = isProfessional;
+  const isVerified = true;
 
   return (
     <div className="flex flex-col items-center justify-center py-12">
